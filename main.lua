@@ -2,7 +2,7 @@
 
 function chooseShotType()
   shotType = love.math.random(1,5)
-  print("Shoot mode: " .. shotType)
+  -- shotType = 4
 
   if shotType == 1 then -- normal
    sp = 100
@@ -16,12 +16,30 @@ function chooseShotType()
    elseif shotType == 4 then -- homing bullets
    sp = 110
    nm = 5
-   elseif shotType == 5 then -- backup
+   elseif shotType == 5 then -- drone
    sp = 100
    nm = 16
   end
 end
 
+function shotString()
+   if shotType == 1 then -- normal
+     return "Normal"
+  elseif shotType == 2 then -- triple shot
+     return "Triple"
+
+  elseif shotType == 3 then -- fast firing
+     return "Fast"
+
+   elseif shotType == 4 then -- homing bullets
+     return "Homing"
+
+   elseif shotType == 5 then -- drone
+     return "Drone"
+
+   end
+  return ""
+end 
 
 function love.load(arg)
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
@@ -30,6 +48,8 @@ function love.load(arg)
   chooseShotType()
   
   timeElapsed = 0
+  lastTenSeconds = 0
+  score = 0
   
   sophie = love.graphics.newImage("Sophie.png")
   
@@ -81,24 +101,54 @@ function love.update(dt)
   
   -- print((math.floor(timeElapsed) % 10))
   
-  if((math.floor(timeElapsed) % 10) == 0) then
+  -- hacky, detect every 10 seconds
+  local lastTenSecondsLocal = ((math.floor(timeElapsed)/10) % 10)
+  if((math.floor(timeElapsed) % 10) == 0) and (lastTenSecondsLocal ~= lastTenSeconds) then
+    lastTenSeconds = ((math.floor(timeElapsed)/10) % 10)
     chooseShotType()
+    print("lastTenSeconds: " .. lastTenSeconds .. " remainder: " .. (math.floor(timeElapsed) % 10))
   end
 
   -- keyboard actions for our hero
   if love.keyboard.isDown("left") then
     hero.x = hero.x - hero.speed*dt
+    drone.x = drone.x - drone.speed*dt*1.5
   elseif love.keyboard.isDown("right") then
     hero.x = hero.x + hero.speed*dt
+    drone.x = drone.x + drone.speed*dt*1.5
   end
 
   local remEnemy = {}
+  local remHardEnemy = {}
   local remShot = {}
 
   -- update the shots
   for i,v in ipairs(hero.shots) do
     -- move them up up up
     v.y = v.y - dt * sp
+
+    if(shotType == 4) then 
+      local enemyDist = 9999
+      local enemyDir = 0
+      local enemyX = v.x
+      for ii,vv in ipairs(enemies) do
+        -- find closest
+        if ((math.abs(v.x - vv.x) < enemyDist) or enemyDist == 9999) then
+          enemyDist = math.abs(v.x - vv.x)
+          enemyX = vv.x
+        end
+      end
+      
+      if(v.x > enemyX) then
+        enemyDir = -1
+      elseif (v.x < enemyX) then
+        enemyDir = 1
+      end
+      -- print(enemyDir .. " " .. enemyDist .. " " .. v.x .. " " .. enemyX)
+      local factor = ((500 - v.y)/1000)
+      print("factor: " .. factor)
+      v.x = v.x + dt*sp*enemyDir*factor
+    end
 
     -- mark shots that are not visible for removal
     if v.y < 0 then
@@ -112,14 +162,16 @@ function love.update(dt)
         table.insert(remEnemy, ii)
         -- mark the shot to be removed
         table.insert(remShot, i)
+        score = score + 3
       end
     end
     for ii,vv in ipairs(hardenemies) do
       if CheckCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
         -- mark that enemy for removal
-        table.insert(remEnemy, ii)
+        table.insert(remHardEnemy, ii)
         -- mark the shot to be removed
         table.insert(remShot, i)
+        score = score + 10
       end
     end
   end
@@ -127,6 +179,9 @@ function love.update(dt)
   -- remove the marked enemies
   for i,v in ipairs(remEnemy) do
     table.remove(enemies, v)
+  end
+  -- remove the marked enemies
+  for i,v in ipairs(remHardEnemy) do
     table.remove(hardenemies, v)
   end
 
@@ -141,7 +196,7 @@ function love.update(dt)
 
     -- check for collision with ground
     if v.y > 465 then
-      -- you loose!!!
+      -- you lose!!!
     end
   end
   for i,v in ipairs(hardenemies) do
@@ -163,12 +218,19 @@ function love.draw()
   love.graphics.setColor(0,255,0,255)
   love.graphics.rectangle("fill", 0, 465, 800, 150)
 
+  -- draw overlay
+  love.graphics.setColor(255,255,255,255)
+  love.graphics.print( "Shot: " .. shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
+  love.graphics.print( "Score: " .. score, 800, 20, 0.1, 1.8, 1.6, 100) 
+
   -- let's draw our hero
   love.graphics.setColor(255,255,0,255)
   love.graphics.rectangle("fill", hero.x, hero.y, hero.width, hero.height)
   
-    love.graphics.setColor(0,200,200 ,  255)
-  love.graphics.rectangle("fill", drone.x, drone.y, drone.width, drone.height)
+  if shotType == 5 then
+    love.graphics.setColor(0,200,200,255)
+    love.graphics.rectangle("fill", drone.x, drone.y, drone.width, drone.height)
+  end
 
   -- let's draw our heros shots
   love.graphics.setColor(150,150,150,255)
@@ -205,6 +267,13 @@ function shoot()
    shot3.x = hero.x-10+hero.width/2
    shot3.y = hero.y+10
    table.insert(hero.shots, shot3)
+  end
+  
+  if shotType == 5 then
+    local shotDrone = {}
+    shotDrone.x = drone.x+drone.width/2
+    shotDrone.y = drone.y
+    table.insert(hero.shots, shotDrone)
   end
 end
 
