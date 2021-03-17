@@ -1,7 +1,9 @@
 -- from [LÖVE tutorial, part 2](http://www.headchant.com/2010/12/31/love2d-%E2%80%93-tutorial-part-2-pew-pew/)
+local cron = require 'cron'
 
-function chooseShotType()
-  shotType = love.math.random(1,5)
+function chooseShotType(mode)
+  mode = mode or love.math.random(1,6)
+  shotType = mode
   -- shotType = 4
 
   if shotType == 1 then -- normal
@@ -19,6 +21,9 @@ function chooseShotType()
    elseif shotType == 5 then -- drone
    sp = 100
    nm = 16
+   elseif shotType == 6 then -- drone
+   sp = 1500
+   nm = 1
   end
 end
 
@@ -36,16 +41,21 @@ function shotString()
 
    elseif shotType == 5 then -- drone
      return "Drone"
-
+     
+   elseif shotType == 6 then -- sniper 
+     return "Sniper"
+     
    end
-  return ""
 end 
 
 function love.load(arg)
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   io.stdout:setvbuf('no')
     
-  chooseShotType()
+  love.window.setTitle("Matthew's Shooter")
+  --love.window.setFullscreen( true )
+    
+  chooseShotType(1)
   
   timeElapsed = 0
   lastTenSeconds = 0
@@ -89,6 +99,12 @@ function love.load(arg)
   end
 end
 
+function love.keypressed(k)
+   if k == 'escape' then
+      love.event.quit()
+   end
+end
+
 function love.keyreleased(key)
   -- in v0.9.2 and earlier space is represented by the actual space character ' ', so check for both
   if (key == " " or key == "space") then
@@ -96,18 +112,11 @@ function love.keyreleased(key)
   end
 end
 
+local timer = cron.every(10,  chooseShotType)
+
 function love.update(dt)
-  timeElapsed = timeElapsed + dt
-  
-  -- print((math.floor(timeElapsed) % 10))
-  
-  -- hacky, detect every 10 seconds
-  local lastTenSecondsLocal = ((math.floor(timeElapsed)/10) % 10)
-  if((math.floor(timeElapsed) % 10) == 0) and (lastTenSecondsLocal ~= lastTenSeconds) then
-    lastTenSeconds = ((math.floor(timeElapsed)/10) % 10)
-    chooseShotType()
-    print("lastTenSeconds: " .. lastTenSeconds .. " remainder: " .. (math.floor(timeElapsed) % 10))
-  end
+  timer:update(dt)
+ 
 
   -- keyboard actions for our hero
   if love.keyboard.isDown("left") then
@@ -192,7 +201,7 @@ function love.update(dt)
   -- update those evil enemies
   for i,v in ipairs(enemies) do
     -- let them fall down slowly
-    v.y = v.y + dt
+    v.y = v.y + dt*3
 
     -- check for collision with ground
     if v.y > 465 then
@@ -201,7 +210,7 @@ function love.update(dt)
   end
   for i,v in ipairs(hardenemies) do
     -- let them fall down slowly
-    v.y = v.y + 2*dt
+    v.y = v.y + 6*dt
 
     -- check for collision with ground
     if v.y > 465 then
@@ -278,9 +287,10 @@ function shoot()
 end
 
 -- Collision detection function.
--- Checks if a and b overlap.
+-- Checks if a an d b overlap.
 -- w and h mean width and height.
 function CheckCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
   local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
   return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 end
+   
