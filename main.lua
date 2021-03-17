@@ -1,5 +1,6 @@
 -- from [LÖVE tutorial, part 2](http://www.headchant.com/2010/12/31/love2d-%E2%80%93-tutorial-part-2-pew-pew/)
 local cron = require 'cron'
+require("paddy")
 
 function chooseShotType(mode)
   mode = mode or love.math.random(1,6)
@@ -48,13 +49,59 @@ function shotString()
    end
 end 
 
+local fullscreen = false
+
+-- call after toggling fullscreen/window
+function initDisplay(full)
+  fullscreen = full
+  
+  local target_width, target_height
+  if(fullscreen) then
+    target_width, target_height = love.window.getDesktopDimensions()
+    love.window.setFullscreen( true )
+  else
+    love.window.setMode(400, 400, {borderless=false, resizable=true})
+    -- target_width, target_height = love.window.getMode()
+    target_width = 400
+    target_height = 400
+    love.window.setFullscreen( false )
+  end
+  
+  love.resize(target_width, target_height)
+end
+
+-- called on window resize
+function love.resize(w, h)
+  local scale_x = w / win_width
+  local scale_y = h / win_height
+  print("scale_x: " .. scale_x)
+  print("scale_y: " .. scale_y)
+  
+  scale = scale_x
+  if(scale_x > scale_y) then
+    scale = scale_y
+  end
+  
+  -- love.graphics.translate(offset_x, offset_y)
+  love.graphics.scale(scale, scale)
+end
+
 function love.load(arg)
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   io.stdout:setvbuf('no')
     
+  mobile = false
+  if love.system.getOS() == 'iOS' or love.system.getOS() == 'Android' then
+    mobile = true
+  end
+  
   love.window.setTitle("Matthew's Shooter")
-  --love.window.setFullscreen( true )
-    
+  win_width = love.graphics.getWidth()
+  win_height = love.graphics.getHeight()
+  print("screen_width: " .. win_width)
+  print("screen_height: " .. win_height)
+  initDisplay(false)
+  
   chooseShotType(1)
   
   timeElapsed = 0
@@ -103,6 +150,12 @@ function love.keypressed(k)
    if k == 'escape' then
       love.event.quit()
    end
+   if k == 'f' then
+      initDisplay(true)
+   end
+   if k == 'w' then
+      initDisplay(false)
+   end
 end
 
 function love.keyreleased(key)
@@ -116,15 +169,19 @@ local timer = cron.every(10,  chooseShotType)
 
 function love.update(dt)
   timer:update(dt)
- 
+  paddy.update(dt)
 
   -- keyboard actions for our hero
-  if love.keyboard.isDown("left") then
+  if love.keyboard.isDown("left") or paddy.isDown("left") then
     hero.x = hero.x - hero.speed*dt
     drone.x = drone.x - drone.speed*dt*1.5
-  elseif love.keyboard.isDown("right") then
+  elseif love.keyboard.isDown("right") or paddy.isDown("right") then
     hero.x = hero.x + hero.speed*dt
     drone.x = drone.x + drone.speed*dt*1.5
+  end
+
+  if paddy.isDown("a") then
+    shoot()
   end
 
   local remEnemy = {}
@@ -220,6 +277,8 @@ function love.update(dt)
 end
 
 function love.draw()
+  love.graphics.scale(scale, scale)
+  
   -- let's draw a background
   love.graphics.setColor(255,0,50,255)
 
@@ -256,6 +315,10 @@ function love.draw()
    love.graphics.setColor(255,0,0,255)
  for i,v in ipairs(hardenemies) do
     love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
+  end
+  
+  if mobile then
+    paddy.draw()
   end
 end
 
