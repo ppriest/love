@@ -49,8 +49,6 @@ function shotString()
    end
 end 
 
-local fullscreen = false
-
 -- call after toggling fullscreen/window
 function initDisplay(full)
   fullscreen = full
@@ -60,10 +58,9 @@ function initDisplay(full)
     target_width, target_height = love.window.getDesktopDimensions()
     love.window.setFullscreen( true )
   else
-    love.window.setMode(400, 400, {borderless=false, resizable=true})
-    -- target_width, target_height = love.window.getMode()
-    target_width = 400
-    target_height = 400
+    target_width = 800
+    target_height = 600
+    love.window.setMode(target_width, target_height, {borderless=false, resizable=true})
     love.window.setFullscreen( false )
   end
   
@@ -84,6 +81,10 @@ function love.resize(w, h)
   
   -- love.graphics.translate(offset_x, offset_y)
   love.graphics.scale(scale, scale)
+  offset_x = math.floor(w - (800*scale))/2
+  offset_y = math.floor(h - (600*scale))/2
+  print("offset_x: " .. offset_x)
+  print("offset_y: " .. offset_y)
 end
 
 function love.load(arg)
@@ -127,7 +128,7 @@ function love.load(arg)
   drone.shots = {} -- holds our fired shots
 
   enemies = {}
-  for i=0,15 do
+  for i=0,10 do
     local enemy = {}
     enemy.width = 40
     enemy.height = 20
@@ -136,7 +137,7 @@ function love.load(arg)
     table.insert(enemies, enemy)
   end
   hardenemies = {}
-  for i=0,7 do
+  for i=0,6 do
     local enemy = {}
     enemy.width = 40
     enemy.height = 20
@@ -147,15 +148,19 @@ function love.load(arg)
 end
 
 function love.keypressed(k)
-   if k == 'escape' then
-      love.event.quit()
-   end
-   if k == 'f' then
-      initDisplay(true)
-   end
-   if k == 'w' then
+  if k == 'escape' then
+    if fullscreen then
       initDisplay(false)
-   end
+    else
+      love.event.quit()
+    end
+  end
+  if k == 'f' then
+    initDisplay(true)
+  end
+  if k == 'w' then
+    initDisplay(false)
+  end
 end
 
 function love.keyreleased(key)
@@ -278,6 +283,8 @@ end
 
 function love.draw()
   love.graphics.scale(scale, scale)
+  love.graphics.translate(offset_x, offset_y) -- needed when centering so coordinates remain consistent
+	love.graphics.setScissor(offset_x, offset_y, (800*scale), (600*scale)) -- keeps out-of-bound objects hidden, needs testing
   
   -- let's draw a background
   love.graphics.setColor(255,0,50,255)
