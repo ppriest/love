@@ -1,5 +1,5 @@
 -- from [LÖVE tutorial, part 2](http://www.headchant.com/2010/12/31/love2d-%E2%80%93-tutorial-part-2-pew-pew/)
-local cron = require 'cron'
+local cron = require "cron"
 require("paddy")
 require("globals")
 
@@ -7,11 +7,18 @@ local game_x = 800
 local game_y = 600
 local offset_x
 local offset_y
+local fullscreen
+
 local sophie
+local shots
 local hero = {}
 local drone = {}
 local enemies = {}
 local hardenemies = {}
+local nm
+local sp
+local score
+local shotType
 
 local ground_height = 465
 local hero_height = 15
@@ -27,29 +34,29 @@ local function checkCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
 end
   
 local function shoot()
-  if #hero.shots >= nm then return end
+  if #shots >= nm then return end
   
   local shot = {}
   shot.x = hero.x+hero.width/2
   shot.y = hero.y
-  table.insert(hero.shots, shot)
+  table.insert(shots, shot)
   
   if shotType == 2 then
    local shot2 = {}
    shot2.x = hero.x+10+hero.width/2
    shot2.y = hero.y+10
-   table.insert(hero.shots, shot2)
+   table.insert(shots, shot2)
    local shot3 = {}
    shot3.x = hero.x-10+hero.width/2
    shot3.y = hero.y+10
-   table.insert(hero.shots, shot3)
+   table.insert(shots, shot3)
   end
   
   if shotType == 5 then
     local shotDrone = {}
     shotDrone.x = drone.x+drone.width/2
     shotDrone.y = drone.y
-    table.insert(hero.shots, shotDrone)
+    table.insert(shots, shotDrone)
   end
 end
 
@@ -212,20 +219,19 @@ function love.load(arg)
   sophie = love.graphics.newImage("Sophie.png")
 
   score = 0
-  
+  shots = {} -- holds our fired shots
+ 
   hero.x = 300 -- x,y coordinates of the hero
   hero.y = ground_height-hero_height
   hero.width = 30
   hero.height = hero_height
   hero.speed = 150
-  hero.shots = {} -- holds our fired shots
   
   drone.x = 320 -- x,y coordinates of the drone
   drone.y = ground_height-hero_height
   drone.width = 30
   drone.height = hero_height
   drone.speed = 150
-  drone.shots = {} -- holds our fired shots
 
   for i=0,10 do
     local enemy = {}
@@ -271,7 +277,8 @@ function love.keyreleased(key)
   end
 end
 
-local timer = cron.every(10,  chooseShotType)
+local timer2 = cron.every(10, chooseShotType)
+local timer = cron.every(30, function() rainbow_bg = not rainbow_bg end)
 
 function love.update(dt)
   timer:update(dt)
@@ -295,7 +302,7 @@ function love.update(dt)
   local remShot = {}
 
   -- update the shots
-  for i,v in ipairs(hero.shots) do
+  for i,v in ipairs(shots) do
     -- move them up up up
     v.y = v.y - dt * sp
 
@@ -359,7 +366,7 @@ function love.update(dt)
   end
 
   for i,v in ipairs(remShot) do
-    table.remove(hero.shots, v)
+    table.remove(shots, v)
   end
 
   -- update those evil enemies
@@ -418,7 +425,7 @@ function love.draw()
 
   -- let's draw our heros shots
   love.graphics.setColor(0.5,0.5,0.5,1)
-  for i,v in ipairs(hero.shots) do
+  for i,v in ipairs(shots) do
     love.graphics.rectangle("fill", v.x, v.y, 2, 5)
   end 
 
