@@ -224,8 +224,7 @@ function love.keypressed(k)
 end
 
 function love.keyreleased(key)
-  -- in v0.9.2 and earlier space is represented by the actual space character ' ', so check for both
-  if (key == " " or key == "space") then
+  if (key == "space") then
     shoot()
   end
 end
