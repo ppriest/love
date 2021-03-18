@@ -2,6 +2,12 @@
 local cron = require 'cron'
 require("paddy")
 
+local game_x = 800
+local game_y = 600
+
+local ground_height = 465
+local hero_height = 15
+
 function gradientMesh(dir, ...)
     -- Check for direction
     local isHorizontal = true
@@ -97,8 +103,8 @@ function initDisplay(full)
     target_width, target_height = love.window.getDesktopDimensions()
     love.window.setFullscreen( true )
   else
-    target_width = 800
-    target_height = 600
+    target_width = game_x
+    target_height = game_y
     love.window.setMode(target_width, target_height, {borderless=false, resizable=true})
     love.window.setFullscreen( false )
   end
@@ -125,8 +131,8 @@ function love.resize(w, h)
   
   -- love.graphics.translate(offset_x, offset_y)
   love.graphics.scale(scale, scale)
-  offset_x = math.floor(w - (800*scale))/2
-  offset_y = math.floor(h - (600*scale))/2
+  offset_x = math.floor(w - (game_x*scale))/2
+  offset_y = math.floor(h - (game_y*scale))/2
   print("  offset_x: " .. offset_x)
   print("  offset_y: " .. offset_y)
 end
@@ -167,17 +173,17 @@ function love.load(arg)
   
   hero = {} -- new table for the hero
   hero.x = 300 -- x,y coordinates of the hero
-  hero.y = 450
+  hero.y = ground_height-hero_height
   hero.width = 30
-  hero.height = 15
+  hero.height = hero_height
   hero.speed = 150
   hero.shots = {} -- holds our fired shots
   
   drone = {} -- new table for the drone
   drone.x = 320 -- x,y coordinates of the drone
-  drone.y = 450
+  drone.y = ground_height-hero_height
   drone.width = 30
-  drone.height = 15
+  drone.height = hero_height
   drone.speed = 150
   drone.shots = {} -- holds our fired shots
 
@@ -320,7 +326,7 @@ function love.update(dt)
     v.y = v.y + dt*3
 
     -- check for collision with ground
-    if v.y > 465 then
+    if v.y > ground_height then
       -- you lose!!!
     end
   end
@@ -329,7 +335,7 @@ function love.update(dt)
     v.y = v.y + 6*dt
 
     -- check for collision with ground
-    if v.y > 465 then
+    if v.y > ground_height then
       -- you lose!!!
     end
   end
@@ -338,23 +344,23 @@ end
 function love.draw()
   -- scale proportionally, center, and clip
   love.graphics.translate(offset_x, offset_y) -- needed when centering so coordinates remain consistent
-	love.graphics.setScissor(offset_x, offset_y, (800*scale), (600*scale)) -- keeps out-of-bound objects hidden, needs testing
+	love.graphics.setScissor(offset_x, offset_y, (game_x*scale), (game_y*scale)) -- keeps out-of-bound objects hidden, needs testing
   love.graphics.scale(scale, scale)
   
   -- let's draw a background
   --love.graphics.setColor(0,0,0.2,1.0)
-  --love.graphics.rectangle("fill", 0, 0, 800, 600)
+  --love.graphics.rectangle("fill", 0, 0, game_x, game_y)
   love.graphics.setColor(1,1,1,1) 
-  love.graphics.draw(rainbow, 0, 0, 0, 800, 600)
+  love.graphics.draw(rainbow, 0, 0, 0, game_x, game_y)
 
   -- let's draw some ground
   love.graphics.setColor(0,0.6,0,1.0)
-  love.graphics.rectangle("fill", 0, 465, 800, 150)
+  love.graphics.rectangle("fill", 0, ground_height, game_x, game_y-ground_height)
 
   -- draw overlay
   love.graphics.setColor(1,1,1,1)
   love.graphics.print( "Shot: " .. shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
-  love.graphics.print( "Score: " .. score, 800, 20, 0.1, 1.8, 1.6, 100) 
+  love.graphics.print( "Score: " .. score, game_x, 20, 0.1, 1.8, 1.6, 100) 
 
   -- let's draw our hero
   love.graphics.setColor(1,1,0,1)
@@ -377,11 +383,12 @@ function love.draw()
     --love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
     love.graphics.draw(sophie, v.x, v.y, 0, 0.1, 0.1)
   end
-   love.graphics.setColor(1,0,0,1)
- for i,v in ipairs(hardenemies) do
+  love.graphics.setColor(1,0,0,1)
+  for i,v in ipairs(hardenemies) do
     love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
   end
   
+  love.graphics.setColor(1,1,1,1)
   if mobile then
     paddy.draw()
   end
