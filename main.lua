@@ -1,6 +1,7 @@
 -- from [LÖVE tutorial, part 2](http://www.headchant.com/2010/12/31/love2d-%E2%80%93-tutorial-part-2-pew-pew/)
 local cron = require 'cron'
 require("paddy")
+require("globals")
 
 local game_x = 800
 local game_y = 600
@@ -15,6 +16,7 @@ local hardenemies = {}
 local ground_height = 465
 local hero_height = 15
 local mobile = false
+local rainbow_bg = false
 
 -- Collision detection function.
 -- Checks if a an d b overlap.
@@ -252,14 +254,14 @@ function love.keypressed(k)
       love.event.quit()
     end
   end
-  if k == 'f' then
-    initDisplay(true)
+  if k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
+    initDisplay(not fullscreen)
   end
-  if k == 'w' then
-    initDisplay(false)
+  if k == 'r' then -- toggle rainbow
+    rainbow_bg = not rainbow_bg
   end
-  if k == 'g' then
-    require("globals").start()
+  if k == 'g' then -- dump globals
+    dump(_G,"")
   end
 end
 
@@ -388,10 +390,13 @@ function love.draw()
   love.graphics.scale(scale, scale)
   
   -- let's draw a background
-  love.graphics.setColor(0,0,0.1,1.0)
-  love.graphics.rectangle("fill", 0, 0, game_x, game_y)
-  --love.graphics.setColor(1,1,1,1) 
-  --love.graphics.draw(rainbow, 0, 0, 0, game_x, game_y)
+  if(rainbow_bg) then
+    love.graphics.setColor(1,1,1,1) 
+    love.graphics.draw(rainbow, 0, 0, 0, game_x, game_y)
+  else
+    love.graphics.setColor(0,0,0.1,1.0)
+    love.graphics.rectangle("fill", 0, 0, game_x, game_y)
+  end
 
   -- let's draw some ground
   love.graphics.setColor(0,0.6,0,1.0)

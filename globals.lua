@@ -20,4 +20,4 @@ function dump(t,i)
 	end
 end
 
-dump(_G,"")
+-- dump(_G,"")
