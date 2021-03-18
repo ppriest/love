@@ -4,11 +4,54 @@ require("paddy")
 
 local game_x = 800
 local game_y = 600
+local offset_x
+local offset_y
+local sophie
+local hero = {}
+local drone = {}
+local enemies = {}
+local hardenemies = {}
 
 local ground_height = 465
 local hero_height = 15
+local mobile = false
 
-function gradientMesh(dir, ...)
+-- Collision detection function.
+-- Checks if a an d b overlap.
+-- w and h mean width and height.
+local function checkCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
+  local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
+  return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
+end
+  
+local function shoot()
+  if #hero.shots >= nm then return end
+  
+  local shot = {}
+  shot.x = hero.x+hero.width/2
+  shot.y = hero.y
+  table.insert(hero.shots, shot)
+  
+  if shotType == 2 then
+   local shot2 = {}
+   shot2.x = hero.x+10+hero.width/2
+   shot2.y = hero.y+10
+   table.insert(hero.shots, shot2)
+   local shot3 = {}
+   shot3.x = hero.x-10+hero.width/2
+   shot3.y = hero.y+10
+   table.insert(hero.shots, shot3)
+  end
+  
+  if shotType == 5 then
+    local shotDrone = {}
+    shotDrone.x = drone.x+drone.width/2
+    shotDrone.y = drone.y
+    table.insert(hero.shots, shotDrone)
+  end
+end
+
+local function gradientMesh(dir, ...)
     -- Check for direction
     local isHorizontal = true
     if dir == "vertical" then
@@ -47,7 +90,7 @@ function gradientMesh(dir, ...)
     return love.graphics.newMesh(meshData, "strip", "static")
 end
 
-function chooseShotType(mode)
+local function chooseShotType(mode)
   mode = mode or love.math.random(1,6)
   shotType = mode
   -- shotType = 4
@@ -73,7 +116,7 @@ function chooseShotType(mode)
   end
 end
 
-function shotString()
+local function shotString()
    if shotType == 1 then -- normal
      return "Normal"
   elseif shotType == 2 then -- triple shot
@@ -95,7 +138,7 @@ function shotString()
 end 
 
 -- call after toggling fullscreen/window
-function initDisplay(full)
+ local function initDisplay(full)
   fullscreen = full
   
   local target_width, target_height
@@ -142,7 +185,6 @@ function love.load(arg)
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   io.stdout:setvbuf('no')
     
-  mobile = false
   if love.system.getOS() == 'iOS' or love.system.getOS() == 'Android' then
     mobile = true
   end
@@ -165,13 +207,10 @@ function love.load(arg)
   )  
   chooseShotType(1)
   
-  timeElapsed = 0
-  lastTenSeconds = 0
+  sophie = love.graphics.newImage("Sophie.png")
+
   score = 0
   
-  sophie = love.graphics.newImage("Sophie.png")
-  
-  hero = {} -- new table for the hero
   hero.x = 300 -- x,y coordinates of the hero
   hero.y = ground_height-hero_height
   hero.width = 30
@@ -179,7 +218,6 @@ function love.load(arg)
   hero.speed = 150
   hero.shots = {} -- holds our fired shots
   
-  drone = {} -- new table for the drone
   drone.x = 320 -- x,y coordinates of the drone
   drone.y = ground_height-hero_height
   drone.width = 30
@@ -187,7 +225,6 @@ function love.load(arg)
   drone.speed = 150
   drone.shots = {} -- holds our fired shots
 
-  enemies = {}
   for i=0,10 do
     local enemy = {}
     enemy.width = 40
@@ -196,7 +233,7 @@ function love.load(arg)
     enemy.y = enemy.height + 100
     table.insert(enemies, enemy)
   end
-  hardenemies = {}
+  
   for i=0,6 do
     local enemy = {}
     enemy.width = 40
@@ -220,6 +257,9 @@ function love.keypressed(k)
   end
   if k == 'w' then
     initDisplay(false)
+  end
+  if k == 'g' then
+    require("globals").start()
   end
 end
 
@@ -261,8 +301,9 @@ function love.update(dt)
       local enemyDist = 9999
       local enemyDir = 0
       local enemyX = v.x
+
+      -- find closest
       for ii,vv in ipairs(enemies) do
-        -- find closest
         if ((math.abs(v.x - vv.x) < enemyDist) or enemyDist == 9999) then
           enemyDist = math.abs(v.x - vv.x)
           enemyX = vv.x
@@ -274,9 +315,9 @@ function love.update(dt)
       elseif (v.x < enemyX) then
         enemyDir = 1
       end
-      -- print(enemyDir .. " " .. enemyDist .. " " .. v.x .. " " .. enemyX)
+	  
+	  -- approach nearest in an arc
       local factor = ((500 - v.y)/1000)
-      print("factor: " .. factor)
       v.x = v.x + dt*sp*enemyDir*factor
     end
 
@@ -287,21 +328,21 @@ function love.update(dt)
 
     -- check for collision with enemies
     for ii,vv in ipairs(enemies) do
-      if CheckCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
+      if checkCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
         -- mark that enemy for removal
         table.insert(remEnemy, ii)
         -- mark the shot to be removed
         table.insert(remShot, i)
-        score = score + 3
+        score = score + 1
       end
     end
     for ii,vv in ipairs(hardenemies) do
-      if CheckCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
+      if checkCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
         -- mark that enemy for removal
         table.insert(remHardEnemy, ii)
         -- mark the shot to be removed
         table.insert(remShot, i)
-        score = score + 10
+        score = score + 3
       end
     end
   end
@@ -342,15 +383,15 @@ end
 
 function love.draw()
   -- scale proportionally, center, and clip
-  love.graphics.translate(offset_x, offset_y) -- needed when centering so coordinates remain consistent
-	love.graphics.setScissor(offset_x, offset_y, (game_x*scale), (game_y*scale)) -- keeps out-of-bound objects hidden, needs testing
+  love.graphics.translate(offset_x, offset_y)
+  love.graphics.setScissor(offset_x, offset_y, (game_x*scale), (game_y*scale))
   love.graphics.scale(scale, scale)
   
   -- let's draw a background
-  --love.graphics.setColor(0,0,0.2,1.0)
-  --love.graphics.rectangle("fill", 0, 0, game_x, game_y)
-  love.graphics.setColor(1,1,1,1) 
-  love.graphics.draw(rainbow, 0, 0, 0, game_x, game_y)
+  love.graphics.setColor(0,0,0.1,1.0)
+  love.graphics.rectangle("fill", 0, 0, game_x, game_y)
+  --love.graphics.setColor(1,1,1,1) 
+  --love.graphics.draw(rainbow, 0, 0, 0, game_x, game_y)
 
   -- let's draw some ground
   love.graphics.setColor(0,0.6,0,1.0)
@@ -392,39 +433,4 @@ function love.draw()
     paddy.draw()
   end
 end
-
-function shoot()
-  if #hero.shots >= nm then return end
-  
-  local shot = {}
-  shot.x = hero.x+hero.width/2
-  shot.y = hero.y
-  table.insert(hero.shots, shot)
-  
-  if shotType == 2 then
-   local shot2 = {}
-   shot2.x = hero.x+10+hero.width/2
-   shot2.y = hero.y+10
-   table.insert(hero.shots, shot2)
-   local shot3 = {}
-   shot3.x = hero.x-10+hero.width/2
-   shot3.y = hero.y+10
-   table.insert(hero.shots, shot3)
-  end
-  
-  if shotType == 5 then
-    local shotDrone = {}
-    shotDrone.x = drone.x+drone.width/2
-    shotDrone.y = drone.y
-    table.insert(hero.shots, shotDrone)
-  end
-end
-
--- Collision detection function.
--- Checks if a an d b overlap.
--- w and h mean width and height.
-function CheckCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
-  local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
-  return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
-end
-   
+ 
