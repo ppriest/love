@@ -1,7 +1,10 @@
 -- from [LÖVE tutorial, part 2](http://www.headchant.com/2010/12/31/love2d-%E2%80%93-tutorial-part-2-pew-pew/)
+Object = require "classic"
 local cron = require "cron"
 require("paddy")
 require("globals")
+
+require("hero")
 
 local game_x = 800
 local game_y = 600
@@ -11,8 +14,8 @@ local fullscreen
 
 local sophie
 local shots
-local hero = {}
-local drone = {}
+local hero
+local drone
 local enemies = {}
 local hardenemies = {}
 local nm
@@ -21,7 +24,6 @@ local score
 local shotType
 
 local ground_height = 465
-local hero_height = 15
 local mobile = false
 local rainbow_bg = false
 
@@ -36,26 +38,32 @@ end
 local function shoot()
   if #shots >= nm then return end
   
+  local hx = hero:getX()+hero:getWidth()/2
+  local hy = hero:getY()
+  
   local shot = {}
-  shot.x = hero.x+hero.width/2
-  shot.y = hero.y
+  shot.x = hx
+  shot.y = hy
   table.insert(shots, shot)
   
   if shotType == 2 then
    local shot2 = {}
-   shot2.x = hero.x+10+hero.width/2
-   shot2.y = hero.y+10
+   shot2.x = hx+10
+   shot2.y = hy+10
    table.insert(shots, shot2)
    local shot3 = {}
-   shot3.x = hero.x-10+hero.width/2
-   shot3.y = hero.y+10
+   shot3.x = hx-10
+   shot3.y = hy+10
    table.insert(shots, shot3)
   end
   
   if shotType == 5 then
+    local dx = drone:getX()+drone:getWidth()/2
+    local dy = drone:getY()
+    
     local shotDrone = {}
-    shotDrone.x = drone.x+drone.width/2
-    shotDrone.y = drone.y
+    shotDrone.x = dx
+    shotDrone.y = dy
     table.insert(shots, shotDrone)
   end
 end
@@ -102,26 +110,26 @@ end
 local function chooseShotType(mode)
   mode = mode or love.math.random(1,6)
   shotType = mode
-  -- shotType = 4
+  -- shotType = 5
 
   if shotType == 1 then -- normal
-   sp = 100
-   nm = 5
+    sp = 100
+    nm = 5
   elseif shotType == 2 then -- triple shot
-   sp = 130
-   nm = 9
+    sp = 130
+    nm = 9
   elseif shotType == 3 then -- fast firing
-   sp = 750
-   nm = 3
-   elseif shotType == 4 then -- homing bullets
-   sp = 110
-   nm = 5
-   elseif shotType == 5 then -- drone
-   sp = 100
-   nm = 16
-   elseif shotType == 6 then -- drone
-   sp = 1500
-   nm = 1
+    sp = 750
+    nm = 3
+  elseif shotType == 4 then -- homing bullets
+    sp = 110
+    nm = 5
+  elseif shotType == 5 then -- drone
+    sp = 100
+    nm = 16
+  elseif shotType == 6 then -- drone
+    sp = 1500
+    nm = 1
   end
 end
 
@@ -221,17 +229,9 @@ function love.load(arg)
   score = 0
   shots = {} -- holds our fired shots
  
-  hero.x = 300 -- x,y coordinates of the hero
-  hero.y = ground_height-hero_height
-  hero.width = 30
-  hero.height = hero_height
-  hero.speed = 150
-  
-  drone.x = 320 -- x,y coordinates of the drone
-  drone.y = ground_height-hero_height
-  drone.width = 30
-  drone.height = hero_height
-  drone.speed = 150
+  hero = Hero(300, ground_height-15) 
+  drone = Hero(320, ground_height-15, 450) 
+  drone:setColor(0,0.8,0.8,1)
 
   for i=0,10 do
     local enemy = {}
@@ -285,13 +285,14 @@ function love.update(dt)
   paddy.update(dt)
 
   -- keyboard actions for our hero
+  local dir = 0
   if love.keyboard.isDown("left") or paddy.isDown("left") then
-    hero.x = hero.x - hero.speed*dt
-    drone.x = drone.x - drone.speed*dt*1.5
+    dir = -1
   elseif love.keyboard.isDown("right") or paddy.isDown("right") then
-    hero.x = hero.x + hero.speed*dt
-    drone.x = drone.x + drone.speed*dt*1.5
+    dir = 1
   end
+  hero:update(dt, dir)
+  drone:update(dt, dir)
 
   if paddy.isDown("a") then
     shoot()
@@ -415,15 +416,13 @@ function love.draw()
   love.graphics.print( "Score: " .. score, game_x, 20, 0.1, 1.8, 1.6, 100) 
 
   -- let's draw our hero
-  love.graphics.setColor(1,1,0,1)
-  love.graphics.rectangle("fill", hero.x, hero.y, hero.width, hero.height)
+  hero:draw()
   
   if shotType == 5 then
-    love.graphics.setColor(0,0.8,0.8,1)
-    love.graphics.rectangle("fill", drone.x, drone.y, drone.width, drone.height)
+    drone:draw()
   end
 
-  -- let's draw our heros shots
+  -- let's draw our shots
   love.graphics.setColor(0.5,0.5,0.5,1)
   for i,v in ipairs(shots) do
     love.graphics.rectangle("fill", v.x, v.y, 2, 5)
