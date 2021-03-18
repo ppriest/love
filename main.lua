@@ -2,6 +2,45 @@
 local cron = require 'cron'
 require("paddy")
 
+function gradientMesh(dir, ...)
+    -- Check for direction
+    local isHorizontal = true
+    if dir == "vertical" then
+        isHorizontal = false
+    elseif dir ~= "horizontal" then
+        error("bad argument #1 to 'gradient' (invalid value)", 2)
+    end
+
+    -- Check for colors
+    local colorLen = select("#", ...)
+    if colorLen < 2 then
+        error("color list is less than two", 2)
+    end
+
+    -- Generate mesh
+    local meshData = {}
+    if isHorizontal then
+        for i = 1, colorLen do
+            local color = select(i, ...)
+            local x = (i - 1) / (colorLen - 1)
+
+            meshData[#meshData + 1] = {x, 1, x, 1, color[1], color[2], color[3], color[4] or 1}
+            meshData[#meshData + 1] = {x, 0, x, 0, color[1], color[2], color[3], color[4] or 1}
+        end
+    else
+        for i = 1, colorLen do
+            local color = select(i, ...)
+            local y = (i - 1) / (colorLen - 1)
+
+            meshData[#meshData + 1] = {1, y, 1, y, color[1], color[2], color[3], color[4] or 1}
+            meshData[#meshData + 1] = {0, y, 0, y, color[1], color[2], color[3], color[4] or 1}
+        end
+    end
+
+    -- Resulting Mesh has 1x1 image size
+    return love.graphics.newMesh(meshData, "strip", "static")
+end
+
 function chooseShotType(mode)
   mode = mode or love.math.random(1,6)
   shotType = mode
@@ -63,7 +102,10 @@ function initDisplay(full)
     love.window.setMode(target_width, target_height, {borderless=false, resizable=true})
     love.window.setFullscreen( false )
   end
-  
+  print("initDisplay()")
+  print("  target_width: " .. target_width)
+  print("  target_height: " .. target_height)
+ 
   love.resize(target_width, target_height)
 end
 
@@ -71,22 +113,25 @@ end
 function love.resize(w, h)
   local scale_x = w / win_width
   local scale_y = h / win_height
-  print("scale_x: " .. scale_x)
-  print("scale_y: " .. scale_y)
+  print("love.resize()")
+  print("  scale_x: " .. scale_x)
+  print("  scale_y: " .. scale_y)
   
   scale = scale_x
   if(scale_x > scale_y) then
     scale = scale_y
   end
+  print("  => scale: " .. scale)
   
   -- love.graphics.translate(offset_x, offset_y)
   love.graphics.scale(scale, scale)
   offset_x = math.floor(w - (800*scale))/2
   offset_y = math.floor(h - (600*scale))/2
-  print("offset_x: " .. offset_x)
-  print("offset_y: " .. offset_y)
+  print("  offset_x: " .. offset_x)
+  print("  offset_y: " .. offset_y)
 end
 
+local rainbow
 function love.load(arg)
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   io.stdout:setvbuf('no')
@@ -99,10 +144,19 @@ function love.load(arg)
   love.window.setTitle("Matthew's Shooter")
   win_width = love.graphics.getWidth()
   win_height = love.graphics.getHeight()
-  print("screen_width: " .. win_width)
-  print("screen_height: " .. win_height)
+  print("love.load()")
+  print("  win_width: " .. win_width)
+  print("  win_height: " .. win_height)
   initDisplay(false)
   
+  rainbow = gradientMesh("horizontal",
+        {1, 0, 0},
+        {1, 1, 0},
+        {0, 1, 0},
+        {0, 1, 1},
+        {0, 0, 1},
+        {1, 0, 0}
+  )  
   chooseShotType(1)
   
   timeElapsed = 0
@@ -282,44 +336,48 @@ function love.update(dt)
 end
 
 function love.draw()
-  love.graphics.scale(scale, scale)
+  -- scale proportionally, center, and clip
   love.graphics.translate(offset_x, offset_y) -- needed when centering so coordinates remain consistent
 	love.graphics.setScissor(offset_x, offset_y, (800*scale), (600*scale)) -- keeps out-of-bound objects hidden, needs testing
+  love.graphics.scale(scale, scale)
   
   -- let's draw a background
-  love.graphics.setColor(255,0,50,255)
+  --love.graphics.setColor(0,0,0.2,1.0)
+  --love.graphics.rectangle("fill", 0, 0, 800, 600)
+  love.graphics.setColor(1,1,1,1) 
+  love.graphics.draw(rainbow, 0, 0, 0, 800, 600)
 
   -- let's draw some ground
-  love.graphics.setColor(0,255,0,255)
+  love.graphics.setColor(0,0.6,0,1.0)
   love.graphics.rectangle("fill", 0, 465, 800, 150)
 
   -- draw overlay
-  love.graphics.setColor(255,255,255,255)
+  love.graphics.setColor(1,1,1,1)
   love.graphics.print( "Shot: " .. shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
   love.graphics.print( "Score: " .. score, 800, 20, 0.1, 1.8, 1.6, 100) 
 
   -- let's draw our hero
-  love.graphics.setColor(255,255,0,255)
+  love.graphics.setColor(1,1,0,1)
   love.graphics.rectangle("fill", hero.x, hero.y, hero.width, hero.height)
   
   if shotType == 5 then
-    love.graphics.setColor(0,200,200,255)
+    love.graphics.setColor(0,0.8,0.8,1)
     love.graphics.rectangle("fill", drone.x, drone.y, drone.width, drone.height)
   end
 
   -- let's draw our heros shots
-  love.graphics.setColor(150,150,150,255)
+  love.graphics.setColor(0.5,0.5,0.5,1)
   for i,v in ipairs(hero.shots) do
     love.graphics.rectangle("fill", v.x, v.y, 2, 5)
   end 
 
   -- let's draw our enemies
-  love.graphics.setColor(255,200,200,255)
+  love.graphics.setColor(1,0.7,0.7,1)
   for i,v in ipairs(enemies) do
     --love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
     love.graphics.draw(sophie, v.x, v.y, 0, 0.1, 0.1)
   end
-   love.graphics.setColor(255,0,0,255)
+   love.graphics.setColor(1,0,0,1)
  for i,v in ipairs(hardenemies) do
     love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
   end
