@@ -4,6 +4,7 @@ local cron = require "cron"
 require("paddy")
 require("globals")
 
+local utilities = require("utilities")
 require("hero")
 
 local game_x = 800
@@ -18,25 +19,18 @@ local hero
 local drone
 local enemies = {}
 local hardenemies = {}
-local nm
-local sp
-local score
+local maxShotNumber
+local shotSpeed
 local shotType
+local score
 
 local ground_height = 465
 local mobile = false
 local rainbow_bg = false
 
--- Collision detection function.
--- Checks if a an d b overlap.
--- w and h mean width and height.
-local function checkCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
-  local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
-  return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
-end
   
 local function shoot()
-  if #shots >= nm then return end
+  if #shots >= maxShotNumber then return end
   
   local hx = hero:getX()+hero:getWidth()/2
   local hy = hero:getY()
@@ -44,16 +38,20 @@ local function shoot()
   local shot = {}
   shot.x = hx
   shot.y = hy
+  shot.sp = shotSpeed
   table.insert(shots, shot)
   
   if shotType == 2 then
    local shot2 = {}
    shot2.x = hx+10
    shot2.y = hy+10
+   shot2.sp = shotSpeed
    table.insert(shots, shot2)
+   
    local shot3 = {}
    shot3.x = hx-10
    shot3.y = hy+10
+   shot3.sp = shotSpeed
    table.insert(shots, shot3)
   end
   
@@ -68,68 +66,29 @@ local function shoot()
   end
 end
 
-local function gradientMesh(dir, ...)
-    -- Check for direction
-    local isHorizontal = true
-    if dir == "vertical" then
-        isHorizontal = false
-    elseif dir ~= "horizontal" then
-        error("bad argument #1 to 'gradient' (invalid value)", 2)
-    end
-
-    -- Check for colors
-    local colorLen = select("#", ...)
-    if colorLen < 2 then
-        error("color list is less than two", 2)
-    end
-
-    -- Generate mesh
-    local meshData = {}
-    if isHorizontal then
-        for i = 1, colorLen do
-            local color = select(i, ...)
-            local x = (i - 1) / (colorLen - 1)
-
-            meshData[#meshData + 1] = {x, 1, x, 1, color[1], color[2], color[3], color[4] or 1}
-            meshData[#meshData + 1] = {x, 0, x, 0, color[1], color[2], color[3], color[4] or 1}
-        end
-    else
-        for i = 1, colorLen do
-            local color = select(i, ...)
-            local y = (i - 1) / (colorLen - 1)
-
-            meshData[#meshData + 1] = {1, y, 1, y, color[1], color[2], color[3], color[4] or 1}
-            meshData[#meshData + 1] = {0, y, 0, y, color[1], color[2], color[3], color[4] or 1}
-        end
-    end
-
-    -- Resulting Mesh has 1x1 image size
-    return love.graphics.newMesh(meshData, "strip", "static")
-end
-
 local function chooseShotType(mode)
   mode = mode or love.math.random(1,6)
   shotType = mode
   -- shotType = 5
 
   if shotType == 1 then -- normal
-    sp = 100
-    nm = 5
+    shotSpeed = 100
+    maxShotNumber = 5
   elseif shotType == 2 then -- triple shot
-    sp = 130
-    nm = 9
+    shotSpeed = 130
+    maxShotNumber = 9
   elseif shotType == 3 then -- fast firing
-    sp = 750
-    nm = 3
+    shotSpeed = 750
+    maxShotNumber = 3
   elseif shotType == 4 then -- homing bullets
-    sp = 110
-    nm = 5
+    shotSpeed = 110
+    maxShotNumber = 5
   elseif shotType == 5 then -- drone
-    sp = 100
-    nm = 16
+    shotSpeed = 100
+    maxShotNumber = 16
   elseif shotType == 6 then -- drone
-    sp = 1500
-    nm = 1
+    shotSpeed = 1500
+    maxShotNumber = 1
   end
 end
 
@@ -214,7 +173,7 @@ function love.load(arg)
   print("  win_height: " .. win_height)
   initDisplay(false)
   
-  rainbow = gradientMesh("horizontal",
+  rainbow = utilities.gradientMesh("horizontal",
         {1, 0, 0},
         {1, 1, 0},
         {0, 1, 0},
@@ -253,20 +212,21 @@ function love.load(arg)
 end
 
 function love.keypressed(k)
-  if k == 'escape' then
+  local digit = string.byte(k)-48
+  
+  if digit >= 1 and digit <= 6 then -- switch weapons
+    chooseShotType(digit)
+  elseif k == 'escape' then -- fullscreen->window->quit
     if fullscreen then
       initDisplay(false)
     else
       love.event.quit()
     end
-  end
-  if k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
+  elseif k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
     initDisplay(not fullscreen)
-  end
-  if k == 'r' then -- toggle rainbow
+  elseif k == 'r' then -- toggle rainbow
     rainbow_bg = not rainbow_bg
-  end
-  if k == 'g' then -- dump globals
+  elseif k == 'g' then -- dump globals
     dump(_G,"")
   end
 end
@@ -305,7 +265,7 @@ function love.update(dt)
   -- update the shots
   for i,v in ipairs(shots) do
     -- move them up up up
-    v.y = v.y - dt * sp
+    v.y = v.y - dt * v.sp
 
     if(shotType == 4) then 
       local enemyDist = 9999
@@ -328,7 +288,7 @@ function love.update(dt)
 	  
 	  -- approach nearest in an arc
       local factor = ((500 - v.y)/1000)
-      v.x = v.x + dt*sp*enemyDir*factor
+      v.x = v.x + dt*v.sp*enemyDir*factor
     end
 
     -- mark shots that are not visible for removal
@@ -338,7 +298,7 @@ function love.update(dt)
 
     -- check for collision with enemies
     for ii,vv in ipairs(enemies) do
-      if checkCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
+      if utilities.checkBoxCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
         -- mark that enemy for removal
         table.insert(remEnemy, ii)
         -- mark the shot to be removed
@@ -347,7 +307,7 @@ function love.update(dt)
       end
     end
     for ii,vv in ipairs(hardenemies) do
-      if checkCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
+      if utilities.checkBoxCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
         -- mark that enemy for removal
         table.insert(remHardEnemy, ii)
         -- mark the shot to be removed
