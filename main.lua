@@ -76,7 +76,6 @@ end
 local function chooseShotType(mode)
   mode = mode or love.math.random(1,6)
   shotType = mode
-  -- shotType = 5
 
   if shotType == 1 then -- normal
     shotSpeed = 100
@@ -96,28 +95,18 @@ local function chooseShotType(mode)
   elseif shotType == 6 then -- drone
     shotSpeed = 1500
     maxShotNumber = 1
+  else
+    shotSpeed = 0
+    maxShotNumber = 0
   end
 end
 
-local function shotString()
-   if shotType == 1 then -- normal
-     return "Normal"
-  elseif shotType == 2 then -- triple shot
-     return "Triple"
-
-  elseif shotType == 3 then -- fast firing
-     return "Fast"
-
-   elseif shotType == 4 then -- homing bullets
-     return "Homing"
-
-   elseif shotType == 5 then -- drone
-     return "Drone"
-     
-   elseif shotType == 6 then -- sniper 
-     return "Sniper"
-     
-   end
+local function shotString(shotType)
+  local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper" }
+  if shotType >= 1 and shotType <= #shotStrings then
+    return shotStrings[shotType]
+  end
+  return "XXX"
 end 
 
 -- call after toggling fullscreen/window
@@ -221,7 +210,7 @@ end
 function love.keypressed(k)
   local digit = string.byte(k)-48
   
-  if digit >= 1 and digit <= 6 then -- switch weapons
+  if digit >= 0 and digit <= 9 then -- switch weapons
     chooseShotType(digit)
   elseif k == 'escape' then -- fullscreen->window->quit
     if fullscreen then
