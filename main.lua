@@ -1,32 +1,38 @@
--- from [LÖVE tutorial, part 2](http://www.headchant.com/2010/12/31/love2d-%E2%80%93-tutorial-part-2-pew-pew/)
 Object = require "classic"
+require "sstrict/sstrict"
 local cron = require "cron"
-require("paddy")
-require("globals")
+local globals = require("globals")
 
 local utilities = require("utilities")
-require("hero")
+local Hero = require("hero")
 
-local game_x = 800
-local game_y = 600
-local offset_x
-local offset_y
+-- rendering state
+local gameX = 800
+local gameY = 600
+local winWidth
+local winHeight
+local offsetX
+local offsetY
 local fullscreen = false
 local mobile = false
 
-local sophie
+-- resources
+local enemyImage
+
+-- game objects
 local shots
 local hero
 local drone
 local enemies = {}
-local hardenemies = {}
+local hardEnemies = {}
 local maxShotNumber
 local shotSpeed
 local shotType
 local score
-
+local flagStopped = false
+local flagGameover = false
+local flagRainbow = false
 local ground_height = 465
-local rainbow_bg = false
 
   
 local function shoot()
@@ -118,43 +124,43 @@ end
  local function initDisplay(full)
   fullscreen = full
   
-  local target_width, target_height
+  local targetWidth, targetHeight
   if(fullscreen) then
-    target_width, target_height = love.window.getDesktopDimensions()
+    targetWidth, targetHeight = love.window.getDesktopDimensions()
     love.window.setFullscreen( true )
   else
-    target_width = game_x
-    target_height = game_y
-    love.window.setMode(target_width, target_height, {borderless=false, resizable=true})
+    targetWidth = gameX
+    targetHeight = gameY
+    love.window.setMode(targetWidth, targetHeight, {borderless=false, resizable=true})
     love.window.setFullscreen( false )
   end
   print("initDisplay()")
-  print("  target_width: " .. target_width)
-  print("  target_height: " .. target_height)
+  print("  targetWidth: " .. targetWidth)
+  print("  targetHeight: " .. targetHeight)
  
-  love.resize(target_width, target_height)
+  love.resize(targetWidth, targetHeight)
 end
 
 -- called on window resize
 function love.resize(w, h)
-  local scale_x = w / win_width
-  local scale_y = h / win_height
+  local scaleX = w / winWidth
+  local scaleY = h / winHeight
   print("love.resize()")
-  print("  scale_x: " .. scale_x)
-  print("  scale_y: " .. scale_y)
+  print("  scaleX: " .. scaleX)
+  print("  scaleY: " .. scaleY)
   
-  scale = scale_x
-  if(scale_x > scale_y) then
-    scale = scale_y
+  scale = scaleX
+  if(scaleX > scaleY) then
+    scale = scaleY
   end
   print("  => scale: " .. scale)
   
-  -- love.graphics.translate(offset_x, offset_y)
+  -- love.graphics.translate(offsetX, offsetY)
   love.graphics.scale(scale, scale)
-  offset_x = math.floor(w - (game_x*scale))/2
-  offset_y = math.floor(h - (game_y*scale))/2
-  print("  offset_x: " .. offset_x)
-  print("  offset_y: " .. offset_y)
+  offsetX = math.floor(w - (gameX*scale))/2
+  offsetY = math.floor(h - (gameY*scale))/2
+  print("  offsetX: " .. offsetX)
+  print("  offsetY: " .. offsetY)
 end
 
 local rainbow
@@ -167,11 +173,11 @@ function love.load(arg)
   end
   
   love.window.setTitle("Matthew's Shooter")
-  win_width = love.graphics.getWidth()
-  win_height = love.graphics.getHeight()
+  winWidth = love.graphics.getWidth()
+  winHeight = love.graphics.getHeight()
   print("love.load()")
-  print("  win_width: " .. win_width)
-  print("  win_height: " .. win_height)
+  print("  winWidth: " .. winWidth)
+  print("  winHeight: " .. winHeight)
   initDisplay(false)
   
   rainbow = utilities.gradientMesh("horizontal",
@@ -184,7 +190,7 @@ function love.load(arg)
   )  
   chooseShotType(1)
   
-  sophie = love.graphics.newImage("Sophie.png")
+  enemyImage = love.graphics.newImage("sophie.png")
 
   score = 0
   shots = {} -- holds our fired shots
@@ -208,7 +214,7 @@ function love.load(arg)
     enemy.height = 20
     enemy.x = i * (enemy.width + 60) + 100
     enemy.y = enemy.height + 130
-    table.insert(hardenemies, enemy)
+    table.insert(hardEnemies, enemy)
   end
 end
 
@@ -226,9 +232,9 @@ function love.keypressed(k)
   elseif k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
     initDisplay(not fullscreen)
   elseif k == 'r' then -- toggle rainbow
-    rainbow_bg = not rainbow_bg
+    flagRainbow = not flagRainbow
   elseif k == 'g' then -- dump globals
-    dump(_G,"")
+    globals.dump(_G,"")
   end
 end
 
@@ -239,24 +245,25 @@ function love.keyreleased(key)
 end
 
 local timer2 = cron.every(10, chooseShotType)
-local timer = cron.every(30, function() rainbow_bg = not rainbow_bg end)
+local timer = cron.every(30, function() flagRainbow = not flagRainbow end)
 
 function love.update(dt)
   timer:update(dt)
-  paddy.update(dt)
+
+  if flagStopped then
+    return
+  end
 
   -- keyboard actions for our hero
   local dir = 0
-  if love.keyboard.isDown("left") or paddy.isDown("left") then
+  if love.keyboard.isDown("left") then
     dir = -1
-  elseif love.keyboard.isDown("right") or paddy.isDown("right") then
+  elseif love.keyboard.isDown("right") then
     dir = 1
   end
-  hero:update(dt, dir)
-  drone:update(dt, dir)
-
-  if paddy.isDown("a") then
-    shoot()
+  hero:update(dt, dir, gameX, gameY)
+  if shotType == 5 then
+    drone:update(dt, dir, gameX, gameY)
   end
 
   local remEnemy = {}
@@ -307,7 +314,7 @@ function love.update(dt)
         score = score + 1
       end
     end
-    for ii,vv in ipairs(hardenemies) do
+    for ii,vv in ipairs(hardEnemies) do
       if utilities.checkBoxCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
         -- mark that enemy for removal
         table.insert(remHardEnemy, ii)
@@ -324,7 +331,7 @@ function love.update(dt)
   end
   -- remove the marked enemies
   for i,v in ipairs(remHardEnemy) do
-    table.remove(hardenemies, v)
+    table.remove(hardEnemies, v)
   end
 
   for i,v in ipairs(remShot) do
@@ -341,40 +348,42 @@ function love.update(dt)
       -- you lose!!!
     end
   end
-  for i,v in ipairs(hardenemies) do
+  for i,v in ipairs(hardEnemies) do
     -- let them fall down slowly
     v.y = v.y + 6*dt
 
     -- check for collision with ground
     if v.y > ground_height then
       -- you lose!!!
+      flagStopped = true
+      flagGameover = true
     end
   end
 end
 
 function love.draw()
   -- scale proportionally, center, and clip
-  love.graphics.translate(offset_x, offset_y)
-  love.graphics.setScissor(offset_x, offset_y, (game_x*scale), (game_y*scale))
+  love.graphics.translate(offsetX, offsetY)
+  love.graphics.setScissor(offsetX, offsetY, (gameX*scale), (gameY*scale))
   love.graphics.scale(scale, scale)
   
   -- let's draw a background
-  if(rainbow_bg) then
+  if(flagRainbow) then
     love.graphics.setColor(1,1,1,1) 
-    love.graphics.draw(rainbow, 0, 0, 0, game_x, game_y)
+    love.graphics.draw(rainbow, 0, 0, 0, gameX, gameY)
   else
     love.graphics.setColor(0,0,0.1,1.0)
-    love.graphics.rectangle("fill", 0, 0, game_x, game_y)
+    love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   end
 
   -- let's draw some ground
   love.graphics.setColor(0,0.6,0,1.0)
-  love.graphics.rectangle("fill", 0, ground_height, game_x, game_y-ground_height)
+  love.graphics.rectangle("fill", 0, ground_height, gameX, gameY-ground_height)
 
   -- draw overlay
   love.graphics.setColor(1,1,1,1)
   love.graphics.print( "Shot: " .. shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
-  love.graphics.print( "Score: " .. score, game_x, 20, 0.1, 1.8, 1.6, 100) 
+  love.graphics.print( "Score: " .. score, gameX, 20, 0.1, 1.8, 1.6, 100) 
 
   -- let's draw our hero
   hero:draw()
@@ -393,16 +402,21 @@ function love.draw()
   love.graphics.setColor(1,0.7,0.7,1)
   for i,v in ipairs(enemies) do
     --love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
-    love.graphics.draw(sophie, v.x, v.y, 0, 0.1, 0.1)
+    love.graphics.draw(enemyImage, v.x, v.y, 0, 0.1, 0.1)
   end
   love.graphics.setColor(1,0,0,1)
-  for i,v in ipairs(hardenemies) do
+  for i,v in ipairs(hardEnemies) do
     love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
   end
   
+  if flagStopped and flagGameover then
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.printf( 'Game Over!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+  end
+
   love.graphics.setColor(1,1,1,1)
   if mobile then
-    paddy.draw()
+    --touchoverlay.draw()
   end
 end
  

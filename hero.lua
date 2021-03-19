@@ -1,6 +1,4 @@
-Object = require "classic"
-
-Hero = Object:extend()
+local Hero = Object:extend()
 
 function Hero:new(x, y, speed)
   self.x = x or 0
@@ -38,11 +36,19 @@ function Hero:getY()
   return self.y
 end
 
-function Hero:update(dt, dir)
+function Hero:update(dt, dir, game_x, game_y)
   self.x = self.x + self.speed*dt*dir
+  if self.x < 0 then
+    self.x = 0
+  end
+  if self.x >= game_x-self.width then
+    self.x = game_x-self.width-1
+  end
 end
 
 function Hero:draw()
   love.graphics.setColor(self.r,self.g,self.b,self.a)
   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 end
+
+return Hero
