@@ -11,7 +11,8 @@ local game_x = 800
 local game_y = 600
 local offset_x
 local offset_y
-local fullscreen
+local fullscreen = false
+local mobile = false
 
 local sophie
 local shots
@@ -25,7 +26,6 @@ local shotType
 local score
 
 local ground_height = 465
-local mobile = false
 local rainbow_bg = false
 
   
@@ -62,6 +62,7 @@ local function shoot()
     local shotDrone = {}
     shotDrone.x = dx
     shotDrone.y = dy
+    shotDrone.sp = shotSpeed
     table.insert(shots, shotDrone)
   end
 end
