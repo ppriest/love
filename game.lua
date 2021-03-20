@@ -191,26 +191,26 @@ function game.reload(gameX, gameY)
   
   --x, y, speed, health, score, image, quad, quad2
   
-  -- enemies
+  -- red
   for i=0,6 do
     local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, deathSound, enemyImage, enemyQuad[1])
     table.insert(enemies, enemy)
   end
 
-  -- hardenemies
+  -- blue
   for i=0,10 do
-    local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, deathSound, enemyImage, enemyQuad[2], enemyQuad[3])
+    local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, deathSound, enemyImage, enemyQuad[2], enemyQuad[3])
     table.insert(enemies, enemy)
   end
     
-  -- sneakyenemies
+  -- black
   for i=0,2 do
     local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, deathSound, enemyImage, enemyQuad[4], enemyQuad[5])
     table.insert(enemies, enemy)
   end
   
   -- boss
-  local enemy = Enemy(gameX/2 - 32/2, 20, 2, 50, 10, deathSound, enemyImage, enemyQuad[7], enemyQuad[8])
+  local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, deathSound, enemyImage, enemyQuad[7], enemyQuad[8])
   table.insert(enemies, enemy)
 end
 
@@ -320,7 +320,7 @@ end
 
 function game.draw(gameX, gameY)  -- let's draw a background
 
-  love.graphics.setColor(0,0,0.1,1.0)
+  love.graphics.setColor(0.08,0,0.08,1.0)
   love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   if(flagWin) then
     local alpha = (gameTime-winTime)/5
@@ -360,12 +360,12 @@ function game.draw(gameX, gameY)  -- let's draw a background
   if flagGameover then
     love.graphics.setColor(1,1,1,1)
     love.graphics.printf( 'Game Over!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
-    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*200)/2, gameY/3 + 100, 200, "center", 0, 2, 2)
+    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*250)/2, gameY/3 + 90, 250, "center", 0, 2, 2)
   end
   if flagWin then
     love.graphics.setColor(1,1,1,1)
     love.graphics.printf( 'You Win!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
-    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*200)/2, gameY/3 + 100, 200, "center", 0, 2, 2)
+    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*250)/2, gameY/3 + 90, 250, "center", 0, 2, 2)
   end
 
 end
