@@ -8,6 +8,13 @@ function utilities.checkBoxCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
   return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
 end
 
+function utilities.checkBoxCollisionC(a,b)
+  return a:getX() < (b:getX() + b:getWidth()) and 
+        (a:getX() + a:getWidth()) > b:getX() and 
+         a:getY() < (b:getY() + b:getHeight()) and 
+        (a:getY() + a:getHeight()) > b:getY()
+end
+
 function utilities.gradientMesh(dir, ...)
     -- Check for direction
     local isHorizontal = true

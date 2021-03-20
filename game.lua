@@ -300,6 +300,12 @@ function game.update(dt, gameX, gameY)
   for i,enemy in ipairs(enemies) do
     enemy:update(dt)
 
+    -- check for collision between enemy and hero
+    if utilities.checkBoxCollisionC(hero,enemy) then
+      flagStopped = true
+      flagGameover = true
+    end
+
     -- check for collision with ground
     if enemy:getY() > groundHeight then
       flagStopped = true
