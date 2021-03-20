@@ -56,7 +56,6 @@ function love.resize(w, h)
   print("  offsetY: " .. offsetY)
 end
 
-local rainbow
 function love.load(arg)
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   io.stdout:setvbuf('no')
@@ -89,8 +88,6 @@ function love.keypressed(k)
     end
   elseif k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
     initDisplay(not fullscreen)
-  elseif k == 'r' then -- toggle rainbow
-    game.toggleRainbow()
   elseif k == 'g' then -- dump globals
     globals.dump(_G,"")
   end

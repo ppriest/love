@@ -20,7 +20,7 @@ local shotType
 local score
 local flagStopped = false
 local flagGameover = false
-local flagRainbow = false
+local flagWin = false
 local ground_height = 465
 
 function game.shoot()
@@ -62,6 +62,10 @@ function game.shoot()
 end
 
 function game.chooseShotType(mode)
+  if flagStopped then
+    return
+  end
+  
   mode = mode or love.math.random(1,6)
   shotType = mode
 
@@ -95,14 +99,6 @@ function game.shotString(localShotType)
     return shotStrings[localShotType]
   end
   return "XXX"
-end 
-
-function game.toggleRainbow()
-  flagRainbow = not flagRainbow
-end
-
-function game.getRainbow()
-  return flagRainbow
 end
 
 function game.load()
@@ -144,8 +140,7 @@ function game.load()
   end
 end
 
-local timer2 = cron.every(10, game.chooseShotType)
-local timer = cron.every(30, game.toggleRainbow)
+local timer = cron.every(10, game.chooseShotType)
 
 function game.update(dt, gameX, gameY)
   timer:update(dt)
@@ -237,8 +232,8 @@ function game.update(dt, gameX, gameY)
 
   for i,v in ipairs(remShot) do
     table.remove(shots, v)
-  end
-
+  end    
+  
   -- update those evil enemies
   for i,v in ipairs(enemies) do
     -- let them fall down slowly
@@ -251,7 +246,7 @@ function game.update(dt, gameX, gameY)
   end
   for i,v in ipairs(hardEnemies) do
     -- let them fall down slowly
-    v.y = v.y + 10*dt
+    v.y = v.y + 600*dt
 
     -- check for collision with ground
     if v.y > ground_height then
@@ -260,10 +255,17 @@ function game.update(dt, gameX, gameY)
       flagGameover = true
     end
   end
+  
+  -- check for win condition
+  if #hardEnemies == 0 and #enemies == 0 then
+      flagStopped = true
+      flagWin = true
+  end
+
 end
 
 function game.draw(gameX, gameY)  -- let's draw a background
-  if(flagRainbow) then
+  if(flagWin) then
     love.graphics.setColor(1,1,1,1) 
     love.graphics.draw(rainbow, 0, 0, 0, gameX, gameY)
   else
@@ -271,27 +273,11 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   end
 
-  -- let's draw some ground
-  love.graphics.setColor(0,0.6,0,1.0)
-  love.graphics.rectangle("fill", 0, ground_height, gameX, gameY-ground_height)
-
-  -- draw overlay
-  love.graphics.setColor(1,1,1,1)
-  love.graphics.print( "Shot: " .. game.shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
-  love.graphics.print( "Score: " .. score, gameX, 20, 0.1, 1.8, 1.6, 100) 
-
   -- let's draw our hero
   hero:draw()
-  
   if shotType == 5 then
     drone:draw()
   end
-
-  -- let's draw our shots
-  love.graphics.setColor(0.5,0.5,0.5,1)
-  for i,v in ipairs(shots) do
-    love.graphics.rectangle("fill", v.x, v.y, 2, 5)
-  end 
 
   -- let's draw our enemies
   love.graphics.setColor(1,0.7,0.7,1)
@@ -304,9 +290,30 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
   end
   
-  if flagStopped and flagGameover then
+  -- let's draw some ground _over_ the enemies
+  love.graphics.setColor(0,0.6,0,1.0)
+  love.graphics.rectangle("fill", 0, ground_height, gameX, gameY-ground_height)
+   
+   -- shots on top of actors
+  love.graphics.setColor(0.5,0.5,0.5,1)
+  for i,v in ipairs(shots) do
+    love.graphics.rectangle("fill", v.x, v.y, 2, 5)
+  end 
+ 
+  -- draw overlay
+  if(not flagStopped) then
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.print( "Shot: " .. game.shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
+    love.graphics.print( "Score: " .. score, gameX, 20, 0.1, 1.8, 1.6, 100) 
+  end
+  
+  if flagGameover then
     love.graphics.setColor(1,1,1,1)
     love.graphics.printf( 'Game Over!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+  end
+  if flagWin then
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.printf( 'You Win!\n'.. score, (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
   end
 
 end
