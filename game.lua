@@ -119,14 +119,36 @@ function game.load(gameX, gameY)
   )
   
   enemyImage = love.graphics.newImage("gfx.png")
-  enemyQuad[1] = love.graphics.newQuad(16,0,16,16,enemyImage:getDimensions())
-  enemyQuad[2] = love.graphics.newQuad(0,0,16,16,enemyImage:getDimensions())
+  
+  -- blue
+  enemyQuad[1] = love.graphics.newQuad(0,0,16,16,enemyImage:getDimensions())
+  
+  -- red
+  enemyQuad[2] = love.graphics.newQuad(16,0,16,16,enemyImage:getDimensions())
   enemyQuad[3] = love.graphics.newQuad(16,16,16,16,enemyImage:getDimensions())
+  
+  -- black
   enemyQuad[4] = love.graphics.newQuad(32,0,16,16,enemyImage:getDimensions())
   enemyQuad[5] = love.graphics.newQuad(32,16,16,16,enemyImage:getDimensions())
   enemyQuad[6] = love.graphics.newQuad(32,32,16,16,enemyImage:getDimensions())
+  
+  -- boss
   enemyQuad[7] = love.graphics.newQuad(48,0,32,32,enemyImage:getDimensions())
   enemyQuad[8] = love.graphics.newQuad(48,32,32,32,enemyImage:getDimensions())
+  enemyQuad[9] = love.graphics.newQuad(48,64,32,32,enemyImage:getDimensions())
+  
+  --urn rocket
+  enemyQuad[10] = love.graphics.newQuad(0,64,16,16,enemyImage:getDimensions())
+  
+  --red urn rocket
+  enemyQuad[11] = love.graphics.newQuad(16,64,16,16,enemyImage:getDimensions())
+  
+  --shooter
+  enemyQuad[12] = love.graphics.newQuad(80,0,16,16,enemyImage:getDimensions())
+  
+  --drone
+  enemyQuad[12] = love.graphics.newQuad(96,0,16,16,enemyImage:getDimensions())
+
   
   game.reload(gameX, gameY)
 end
@@ -150,18 +172,18 @@ function game.reload(gameX, gameY)
   
   --x, y, speed, health, score, image, quad, quad2
   
-  -- hardenemies
-  for i=0,10 do
-    local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, enemyImage, enemyQuad[1], enemyQuad[3])
-    table.insert(enemies, enemy)
-  end
-  
   -- enemies
   for i=0,6 do
-    local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, enemyImage, enemyQuad[2])
+    local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, enemyImage, enemyQuad[1])
     table.insert(enemies, enemy)
   end
-  
+
+  -- hardenemies
+  for i=0,10 do
+    local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, enemyImage, enemyQuad[2], enemyQuad[3])
+    table.insert(enemies, enemy)
+  end
+    
   -- sneakyenemies
   for i=0,2 do
     local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, enemyImage, enemyQuad[4], enemyQuad[5])
