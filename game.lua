@@ -288,10 +288,10 @@ function game.update(dt, gameX, gameY)
     -- check for collision with enemies
     for ii,enemy in ipairs(enemies) do
       if utilities.checkBoxCollision(shot.x,shot.y,2,5,enemy:getX(),enemy:getY(),enemy:getWidth(),enemy:getHeight()) then
-        score = score + enemy:getScore()
         if(enemy:hit()) then
           -- mark that enemy for removal
           table.insert(remEnemy, ii)
+          score = score + enemy:getScore()
         end
         -- mark the shot to be removed
         table.insert(remShot, i)
