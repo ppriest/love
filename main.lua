@@ -88,6 +88,8 @@ function love.keypressed(k)
     end
   elseif k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
     initDisplay(not fullscreen)
+  elseif k == 'r' then -- reset
+    game.reload()
   elseif k == 'g' then -- dump globals
     globals.dump(_G,"")
   end

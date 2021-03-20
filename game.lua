@@ -17,11 +17,15 @@ local hardEnemies = {}
 local maxShotNumber
 local shotSpeed
 local shotType
+
 local score
-local flagStopped = false
-local flagGameover = false
-local flagWin = false
-local ground_height = 465
+local flagStopped
+local flagGameover
+local flagWin
+local groundHeight = 465
+local winTime
+local gameTime
+
 
 function game.shoot()
   if #shots >= maxShotNumber then return end
@@ -109,18 +113,28 @@ function game.load()
         {0, 1, 1},
         {0, 0, 1},
         {1, 0, 0}
-  )  
-  game.chooseShotType(1)
+  )
   
   enemyImage = love.graphics.newImage("sophie.png")
+  game.reload()
+end
 
+function game.reload()
+  flagStopped = false
+  flagGameover = false
+  flagWin = false
   score = 0
+  winTime = -1
+  gameTime = 0
+
   shots = {} -- holds our fired shots
  
-  hero = Hero(300, ground_height-15) 
-  drone = Hero(320, ground_height-15, 450) 
+  game.chooseShotType(1)
+  hero = Hero(400, groundHeight-15) 
+  drone = Hero(400, groundHeight-15, 450) 
   drone:setColor(0,0.8,0.8,1)
 
+  enemies = {}
   for i=0,10 do
     local enemy = {}
     enemy.width = 40
@@ -130,6 +144,7 @@ function game.load()
     table.insert(enemies, enemy)
   end
   
+  hardEnemies = {}
   for i=0,6 do
     local enemy = {}
     enemy.width = 40
@@ -143,6 +158,7 @@ end
 local timer = cron.every(10, game.chooseShotType)
 
 function game.update(dt, gameX, gameY)
+  gameTime = gameTime + dt
   timer:update(dt)
   
   if flagStopped then
@@ -221,36 +237,28 @@ function game.update(dt, gameX, gameY)
     end
   end
 
-  -- remove the marked enemies
+  -- remove the marked enemies and shots
   for i,v in ipairs(remEnemy) do
     table.remove(enemies, v)
   end
-  -- remove the marked enemies
   for i,v in ipairs(remHardEnemy) do
     table.remove(hardEnemies, v)
   end
-
   for i,v in ipairs(remShot) do
     table.remove(shots, v)
   end    
   
-  -- update those evil enemies
+  -- update the enemies' positions
   for i,v in ipairs(enemies) do
     -- let them fall down slowly
     v.y = v.y + dt*3
-
-    -- check for collision with ground
-    if v.y > ground_height then
-      -- you lose!!!
-    end
   end
   for i,v in ipairs(hardEnemies) do
     -- let them fall down slowly
-    v.y = v.y + 600*dt
+    v.y = v.y + dt*10
 
     -- check for collision with ground
-    if v.y > ground_height then
-      -- you lose!!!
+    if v.y > groundHeight then
       flagStopped = true
       flagGameover = true
     end
@@ -260,17 +268,21 @@ function game.update(dt, gameX, gameY)
   if #hardEnemies == 0 and #enemies == 0 then
       flagStopped = true
       flagWin = true
+      if(winTime < 0) then
+        winTime = gameTime
+      end
   end
 
 end
 
 function game.draw(gameX, gameY)  -- let's draw a background
+
+  love.graphics.setColor(0,0,0.1,1.0)
+  love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   if(flagWin) then
-    love.graphics.setColor(1,1,1,1) 
+    local alpha = (gameTime-winTime)/5
+    love.graphics.setColor(1,1,1,alpha) 
     love.graphics.draw(rainbow, 0, 0, 0, gameX, gameY)
-  else
-    love.graphics.setColor(0,0,0.1,1.0)
-    love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   end
 
   -- let's draw our hero
@@ -292,7 +304,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
   
   -- let's draw some ground _over_ the enemies
   love.graphics.setColor(0,0.6,0,1.0)
-  love.graphics.rectangle("fill", 0, ground_height, gameX, gameY-ground_height)
+  love.graphics.rectangle("fill", 0, groundHeight, gameX, gameY-groundHeight)
    
    -- shots on top of actors
   love.graphics.setColor(0.5,0.5,0.5,1)
