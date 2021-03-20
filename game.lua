@@ -3,6 +3,7 @@ local cron = require "cron"
 
 local utilities = require("utilities")
 local Hero = require("hero")
+local Enemy = require("enemy")
 
 -- resources
 local enemyImage
@@ -135,23 +136,19 @@ function game.reload()
   drone:setColor(0,0.8,0.8,1)
 
   enemies = {}
+  
+  -- first row
   for i=0,10 do
-    local enemy = {}
-    enemy.width = 40
-    enemy.height = 20
-    enemy.x = i * (enemy.width + 30) + 30
-    enemy.y = enemy.height + 100
+    local enemy = Enemy(i*70 + 30, 120, 3, 1, enemyImage)
+    enemy:setColor(1,0.7,0.7,1)
     table.insert(enemies, enemy)
   end
   
-  hardEnemies = {}
+  -- second row
   for i=0,6 do
-    local enemy = {}
-    enemy.width = 40
-    enemy.height = 20
-    enemy.x = i * (enemy.width + 60) + 100
-    enemy.y = enemy.height + 130
-    table.insert(hardEnemies, enemy)
+    local enemy = Enemy(i*90 + 100, 180, 10, 3)
+    enemy:setColor(1,0,0,1)
+    table.insert(enemies, enemy)
   end
 end
 
@@ -178,94 +175,76 @@ function game.update(dt, gameX, gameY)
   end
 
   local remEnemy = {}
-  local remHardEnemy = {}
   local remShot = {}
 
   -- update the shots
-  for i,v in ipairs(shots) do
+  for i,shot in ipairs(shots) do
     -- move them up up up
-    v.y = v.y - dt * v.sp
+    shot.y = shot.y - dt*shot.sp
 
     if(shotType == 4) then 
       local enemyDist = 9999
       local enemyDir = 0
-      local enemyX = v.x
+      local enemyX = shot.x
 
       -- find closest
       --!strict
-      for ii,vv in ipairs(enemies) do
-        if ((math.abs(v.x - vv.x) < enemyDist) or enemyDist == 9999) then
-          enemyDist = math.abs(v.x - vv.x)
-          enemyX = vv.x
+      for ii,enemy in ipairs(enemies) do
+        if ((math.abs(shot.x - enemy.x) < enemyDist) or enemyDist == 9999) then
+          enemyDist = math.abs(shot.x - enemy.x)
+          enemyX = enemy:getX()
         end
       end
       
-      if(v.x > enemyX) then
+      if(shotx > enemyX) then
         enemyDir = -1
-      elseif (v.x < enemyX) then
+      elseif (shot.x < enemyX) then
         enemyDir = 1
       end
 	  
-	  -- approach nearest in an arc
-      local factor = ((500 - v.y)/1000)
-      v.x = v.x + dt*v.sp*enemyDir*factor
+	    -- approach nearest in an arc
+      local factor = ((500 - shot.y)/1000)
+      shot.x = shot.x + dt*shot.sp*enemyDir*factor
     end
 
     -- mark shots that are not visible for removal
-    if v.y < 0 then
+    if shot.y < 0 then
       table.insert(remShot, i)
     end
 
     -- check for collision with enemies
-    for ii,vv in ipairs(enemies) do
-      if utilities.checkBoxCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
-        -- mark that enemy for removal
+    for ii,enemy in ipairs(enemies) do
+      if utilities.checkBoxCollision(shot.x,shot.y,2,5,enemy:getX(),enemy:getY(),enemy:getWidth(),enemy:getHeight()) then
+        score = score + enemy:getScore()
+         -- mark that enemy for removal
         table.insert(remEnemy, ii)
         -- mark the shot to be removed
         table.insert(remShot, i)
-        score = score + 1
-      end
-    end
-    for ii,vv in ipairs(hardEnemies) do
-      if utilities.checkBoxCollision(v.x,v.y,2,5,vv.x,vv.y,vv.width,vv.height) then
-        -- mark that enemy for removal
-        table.insert(remHardEnemy, ii)
-        -- mark the shot to be removed
-        table.insert(remShot, i)
-        score = score + 3
       end
     end
   end
 
   -- remove the marked enemies and shots
-  for i,v in ipairs(remEnemy) do
-    table.remove(enemies, v)
+  for i,enemy in ipairs(remEnemy) do
+    table.remove(enemies, enemy)
   end
-  for i,v in ipairs(remHardEnemy) do
-    table.remove(hardEnemies, v)
-  end
-  for i,v in ipairs(remShot) do
-    table.remove(shots, v)
+  for i,shot in ipairs(remShot) do
+    table.remove(shots, shot)
   end    
   
   -- update the enemies' positions
-  for i,v in ipairs(enemies) do
-    -- let them fall down slowly
-    v.y = v.y + dt*3
-  end
-  for i,v in ipairs(hardEnemies) do
-    -- let them fall down slowly
-    v.y = v.y + dt*10
+  for i,enemy in ipairs(enemies) do
+    enemy:update(dt)
 
     -- check for collision with ground
-    if v.y > groundHeight then
+    if enemy:getY() > groundHeight then
       flagStopped = true
       flagGameover = true
     end
   end
   
   -- check for win condition
-  if #hardEnemies == 0 and #enemies == 0 then
+  if #enemies == 0 then
       flagStopped = true
       flagWin = true
       if(winTime < 0) then
@@ -292,14 +271,8 @@ function game.draw(gameX, gameY)  -- let's draw a background
   end
 
   -- let's draw our enemies
-  love.graphics.setColor(1,0.7,0.7,1)
-  for i,v in ipairs(enemies) do
-    --love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
-    love.graphics.draw(enemyImage, v.x, v.y, 0, 0.1, 0.1)
-  end
-  love.graphics.setColor(1,0,0,1)
-  for i,v in ipairs(hardEnemies) do
-    love.graphics.rectangle("fill", v.x, v.y, v.width, v.height)
+  for i,enemy in ipairs(enemies) do
+    enemy:draw()
   end
   
   -- let's draw some ground _over_ the enemies
