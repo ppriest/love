@@ -220,6 +220,9 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemies, enemy)
     end
   else
+    if(winTime < 0) then
+      winTime = gameTime
+    end
     flagStopped = true
     flagWin = true
   end
@@ -327,9 +330,6 @@ function game.update(dt, gameX, gameY)
   -- check for win condition
   if #enemies == 0 then
     level = level + 1
-    if(winTime < 0) then
-      winTime = gameTime
-    end
     game.spawnEnemies(gameX, gameY)
   end
 
