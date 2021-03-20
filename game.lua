@@ -25,6 +25,8 @@ local maxShotNumber
 local shotSpeed
 local shotType
 
+-- game state
+local level
 local score
 local flagStopped
 local flagGameover
@@ -181,37 +183,46 @@ function game.reload(gameX, gameY)
   music:play()
 
   shots = {} -- holds our fired shots
- 
   game.chooseShotType(1)
   hero = Hero(400, groundHeight-15) 
   drone = Hero(400, groundHeight-15, 450) 
   drone:setColor(0,0.8,0.8,1)
-
-  enemies = {}
   
+  level = 1
+  enemies = {}
+  game.spawnEnemies(gameX, gameY)
+end
+
+function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
   
-  -- red
-  for i=0,6 do
-    local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, deathSound, enemyImage, enemyQuad[1])
-    table.insert(enemies, enemy)
-  end
+  if level == 1 then
+    -- red
+    for i=0,6 do
+      local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, deathSound, enemyImage, enemyQuad[1])
+      table.insert(enemies, enemy)
+    end
 
-  -- blue
-  for i=0,10 do
-    local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, deathSound, enemyImage, enemyQuad[2], enemyQuad[3])
+    -- blue
+    for i=0,10 do
+      local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, deathSound, enemyImage, enemyQuad[2], enemyQuad[3])
+      table.insert(enemies, enemy)
+    end
+          
+  elseif level == 2 then
+    -- boss
+    local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, deathSound, enemyImage, enemyQuad[7], enemyQuad[8])
     table.insert(enemies, enemy)
-  end
-    
-  -- black
-  for i=0,2 do
-    local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, deathSound, enemyImage, enemyQuad[4], enemyQuad[5])
-    table.insert(enemies, enemy)
-  end
   
-  -- boss
-  local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, deathSound, enemyImage, enemyQuad[7], enemyQuad[8])
-  table.insert(enemies, enemy)
+    -- black
+    for i=0,2 do
+      local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, deathSound, enemyImage, enemyQuad[4], enemyQuad[5])
+      table.insert(enemies, enemy)
+    end
+  else
+    flagStopped = true
+    flagWin = true
+  end
 end
 
 local timer = cron.every(10, game.chooseShotType)
@@ -315,11 +326,11 @@ function game.update(dt, gameX, gameY)
   
   -- check for win condition
   if #enemies == 0 then
-      flagStopped = true
-      flagWin = true
-      if(winTime < 0) then
-        winTime = gameTime
-      end
+    level = level + 1
+    if(winTime < 0) then
+      winTime = gameTime
+    end
+    game.spawnEnemies(gameX, gameY)
   end
 
 end
