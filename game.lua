@@ -1,5 +1,11 @@
 require 'slam'
 
+-- TODO
+-- Boss mode, play boss music when there is a boss onscreen
+-- Enemy spawner
+-- Item boxes
+-- Network play
+
 local game = {}
 
 local cron = require "cron"
@@ -13,6 +19,7 @@ local enemyImage
 local enemyQuad = {}
 local rainbow
 local music
+local music2
 local shotSound
 local deathSound
 
@@ -129,7 +136,7 @@ function game.load(gameX, gameY)
         {1, 0, 0}
   )
   
-  enemyImage = love.graphics.newImage("gfx.png")
+  enemyImage = love.graphics.newImage("art/gfx.png")
   
   -- blue
   enemyQuad[1] = love.graphics.newQuad(0,0,16,16,enemyImage:getDimensions())
@@ -160,7 +167,8 @@ function game.load(gameX, gameY)
   --drone
   enemyQuad[13] = love.graphics.newQuad(96,0,16,16,enemyImage:getDimensions())
 
-  music = love.audio.newSource("sounds/Blear Moon - Winter journal.mp3", "stream")
+  music = love.audio.newSource("sounds/538828__puredesigngirl__dramatic-music.mp3", "stream")
+  music2 = love.audio.newSource("sounds/251415__tritus__fight-loop.ogg", "stream")
   --music:setVolume(0.9) -- 90% of ordinary volume
   --music:setPitch(0.5) -- one octave lower
   --music:setVolume(0.7)
@@ -179,9 +187,6 @@ function game.reload(gameX, gameY)
   winTime = -1
   gameTime = 0
 
-  music:stop()
-  music:play()
-
   shots = {} -- holds our fired shots
   game.chooseShotType(1)
   hero = Hero(400, groundHeight-15, 150, enemyImage, enemyQuad[12]) 
@@ -196,6 +201,10 @@ function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
   
   if level == 1 then
+    music:stop()
+    music2:stop()
+    music:play()
+      
     -- red
     for i=0,6 do
       local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, deathSound, enemyImage, enemyQuad[1])
@@ -209,6 +218,10 @@ function game.spawnEnemies(gameX, gameY)
     end
           
   elseif level == 2 then
+    music:stop()
+    music2:stop()
+    music2:play()
+    
     -- boss
     local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, deathSound, enemyImage, enemyQuad[7], enemyQuad[8])
     table.insert(enemies, enemy)
