@@ -117,11 +117,15 @@ function game.load()
         {1, 0, 0}
   )
   
-  --enemyImage = love.graphics.newImage("sophie.png")
   enemyImage = love.graphics.newImage("gfx.png")
   enemyQuad[1] = love.graphics.newQuad(16,0,16,16,enemyImage:getDimensions())
   enemyQuad[2] = love.graphics.newQuad(0,0,16,16,enemyImage:getDimensions())
   enemyQuad[3] = love.graphics.newQuad(16,16,16,16,enemyImage:getDimensions())
+  enemyQuad[4] = love.graphics.newQuad(32,0,16,16,enemyImage:getDimensions())
+  enemyQuad[5] = love.graphics.newQuad(32,16,16,16,enemyImage:getDimensions())
+  enemyQuad[6] = love.graphics.newQuad(32,32,16,16,enemyImage:getDimensions())
+  enemyQuad[7] = love.graphics.newQuad(48,0,32,32,enemyImage:getDimensions())
+  enemyQuad[8] = love.graphics.newQuad(48,32,32,32,enemyImage:getDimensions())
   
   game.reload()
 end
@@ -143,15 +147,27 @@ function game.reload()
 
   enemies = {}
   
-  -- first row
+  --x, y, speed, health, score, image, quad, quad2
+  
+  -- hardenemies
   for i=0,10 do
     local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, enemyImage, enemyQuad[1], enemyQuad[3])
     table.insert(enemies, enemy)
   end
   
-  -- second row
+  -- enemies
   for i=0,6 do
     local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, enemyImage, enemyQuad[2])
+    table.insert(enemies, enemy)
+  end
+  -- sneakyenemies
+  for i=0,2 do
+    local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, enemyImage, enemyQuad[4], enemyQuad[5])
+    table.insert(enemies, enemy)
+  end
+    -- boss
+  for i=0,0 do
+    local enemy = Enemy(300, 20, 2, 50, 10, enemyImage, enemyQuad[7], enemyQuad[8])
     table.insert(enemies, enemy)
   end
 end
