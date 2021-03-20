@@ -7,6 +7,7 @@ local Enemy = require("enemy")
 
 -- resources
 local enemyImage
+local enemyQuad = {}
 local rainbow
 
 -- game objects
@@ -116,7 +117,11 @@ function game.load()
         {1, 0, 0}
   )
   
-  enemyImage = love.graphics.newImage("sophie.png")
+  --enemyImage = love.graphics.newImage("sophie.png")
+  enemyImage = love.graphics.newImage("gfx.png")
+  enemyQuad[1] = love.graphics.newQuad(16,0,16,16,enemyImage:getDimensions())
+  enemyQuad[2] = love.graphics.newQuad(0,0,16,16,enemyImage:getDimensions())
+  
   game.reload()
 end
 
@@ -139,15 +144,13 @@ function game.reload()
   
   -- first row
   for i=0,10 do
-    local enemy = Enemy(i*70 + 30, 120, 3, 1, enemyImage)
-    enemy:setColor(1,0.7,0.7,1)
+    local enemy = Enemy(i*70 + 30, 120, 3, 1, enemyImage, enemyQuad[1])
     table.insert(enemies, enemy)
   end
   
   -- second row
   for i=0,6 do
-    local enemy = Enemy(i*90 + 100, 180, 10, 3)
-    enemy:setColor(1,0,0,1)
+    local enemy = Enemy(i*90 + 100, 180, 10, 3, enemyImage, enemyQuad[2])
     table.insert(enemies, enemy)
   end
 end
@@ -196,7 +199,7 @@ function game.update(dt, gameX, gameY)
         end
       end
       
-      if(shotx > enemyX) then
+      if(shot.x > enemyX) then
         enemyDir = -1
       elseif (shot.x < enemyX) then
         enemyDir = 1
@@ -288,8 +291,10 @@ function game.draw(gameX, gameY)  -- let's draw a background
   -- draw overlay
   if(not flagStopped) then
     love.graphics.setColor(1,1,1,1)
-    love.graphics.print( "Shot: " .. game.shotString(shotType), 10, 20, -0.1, 1.8, 1.6) 
-    love.graphics.print( "Score: " .. score, gameX, 20, 0.1, 1.8, 1.6, 100) 
+    local border = 10
+    love.graphics.printf( "Shot: " .. game.shotString(shotType), border, 25, 200/1.8, "left", -0.1, 1.8, 1.6) 
+    love.graphics.printf( "Score: " .. score, gameX-200-border, 5, 200/1.8, "right", 0.1, 1.8, 1.6) 
+    
   end
   
   if flagGameover then

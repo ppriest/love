@@ -1,6 +1,6 @@
 local Enemy = Object:extend()
 
-function Enemy:new(x, y, speed, score, image)
+function Enemy:new(x, y, speed, score, image, quad)
   self.x = x or 0
   self.y = y or 0
   self.height = 20
@@ -8,10 +8,11 @@ function Enemy:new(x, y, speed, score, image)
   self.speed = speed or 1
   self.score = score or 1
   self.image = image or nil
+  self.quad = quad or nil
   
   self.r = 1
   self.g = 1
-  self.b = 0
+  self.b = 1
   self.a = 1
 end
 
@@ -50,7 +51,11 @@ end
 function Enemy:draw()
   love.graphics.setColor(self.r,self.g,self.b,self.a)
   if(self.image ~= nil) then
-    love.graphics.draw(self.image, self.x, self.y, 0, 0.1, 0.1)
+    if(self.quad ~= nil) then
+      love.graphics.draw(self.image, self.quad, self.x, self.y, 0, 3, 3)
+    else
+      love.graphics.draw(self.image, self.x, self.y, 0, 0.1, 0.1)
+    end
   else
     love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)    
   end
