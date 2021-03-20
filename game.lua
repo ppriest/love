@@ -312,9 +312,8 @@ function game.draw(gameX, gameY)  -- let's draw a background
   if(not flagStopped) then
     love.graphics.setColor(1,1,1,1)
     local border = 10
-    love.graphics.printf( "Shot: " .. game.shotString(shotType), border, 25, 200/1.8, "left", -0.1, 1.8, 1.6) 
-    love.graphics.printf( "Score: " .. score, gameX-200-border, 5, 200/1.8, "right", 0.1, 1.8, 1.6) 
-    
+    love.graphics.printf( "Shot: " .. game.shotString(shotType), border, 50, 400/1.8, "left", -0.1, 1.8, 1.6) 
+    love.graphics.printf( "Score: " .. score, gameX-400-border, 10, 400/1.8, "right", 0.1, 1.8, 1.6) 
   end
   
   if flagGameover then
