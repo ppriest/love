@@ -72,7 +72,7 @@ function love.load(arg)
   print("  winHeight: " .. winHeight)
   initDisplay(false)
   
-  game.load()
+  game.load(gameX, gameY)
 end
 
 function love.keypressed(k)
@@ -89,7 +89,7 @@ function love.keypressed(k)
   elseif k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
     initDisplay(not fullscreen)
   elseif k == 'r' then -- reset
-    game.reload()
+    game.reload(gameX, gameY)
   elseif k == 'g' then -- dump globals
     globals.dump(_G,"")
   end

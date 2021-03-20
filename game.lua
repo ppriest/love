@@ -15,7 +15,6 @@ local shots
 local hero
 local drone
 local enemies = {}
-local hardEnemies = {}
 local maxShotNumber
 local shotSpeed
 local shotType
@@ -107,7 +106,9 @@ function game.shotString(localShotType)
   return "XXX"
 end
 
-function game.load()
+function game.load(gameX, gameY)
+  love.graphics.setDefaultFilter("nearest", "nearest")
+  
   rainbow = utilities.gradientMesh("horizontal",
         {1, 0, 0},
         {1, 1, 0},
@@ -127,12 +128,12 @@ function game.load()
   enemyQuad[7] = love.graphics.newQuad(48,0,32,32,enemyImage:getDimensions())
   enemyQuad[8] = love.graphics.newQuad(48,32,32,32,enemyImage:getDimensions())
   
-  game.reload()
+  game.reload(gameX, gameY)
 end
 
-function game.reload()
-  flagStopped = false
-  flagGameover = false
+function game.reload(gameX, gameY)
+  flagStopped = true
+  flagGameover = true
   flagWin = false
   score = 0
   winTime = -1
@@ -160,16 +161,16 @@ function game.reload()
     local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, enemyImage, enemyQuad[2])
     table.insert(enemies, enemy)
   end
+  
   -- sneakyenemies
   for i=0,2 do
     local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, enemyImage, enemyQuad[4], enemyQuad[5])
     table.insert(enemies, enemy)
   end
-    -- boss
-  for i=0,0 do
-    local enemy = Enemy(300, 20, 2, 50, 10, enemyImage, enemyQuad[7], enemyQuad[8])
-    table.insert(enemies, enemy)
-  end
+  
+  -- boss
+  local enemy = Enemy(gameX/2 - 32/2, 20, 2, 50, 10, enemyImage, enemyQuad[7], enemyQuad[8])
+  table.insert(enemies, enemy)
 end
 
 local timer = cron.every(10, game.chooseShotType)
@@ -212,7 +213,7 @@ function game.update(dt, gameX, gameY)
       for ii,enemy in ipairs(enemies) do
         if ((math.abs(shot.x - enemy.x) < enemyDist) or enemyDist == 9999) then
           enemyDist = math.abs(shot.x - enemy.x)
-          enemyX = enemy:getX()
+          enemyX = enemy:getX() + enemy:getWidth()/2
         end
       end
       
@@ -319,10 +320,12 @@ function game.draw(gameX, gameY)  -- let's draw a background
   if flagGameover then
     love.graphics.setColor(1,1,1,1)
     love.graphics.printf( 'Game Over!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*200)/2, gameY/3 + 100, 200, "center", 0, 2, 2)
   end
   if flagWin then
     love.graphics.setColor(1,1,1,1)
-    love.graphics.printf( 'You Win!\n'.. score, (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+    love.graphics.printf( 'You Win!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*200)/2, gameY/3 + 100, 200, "center", 0, 2, 2)
   end
 
 end
