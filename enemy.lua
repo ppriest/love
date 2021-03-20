@@ -1,14 +1,18 @@
 local Enemy = Object:extend()
 
-function Enemy:new(x, y, speed, health, score, image, quad, quad2)
+function Enemy:new(x, y, speed, health, score, sound, image, quad, quad2)
   self.x = x or 0
   self.y = y or 0
   self.speed = speed or 1
   self.health = health or 1
   self.score = score or 1
+  self.sound = sound
   self.image = image or nil
   self.quad = quad or nil
   self.quad2 = quad2 or nil
+  
+  -- scale up the graphics
+  -- hitbox is smaller than enemy, and centered
   self.scale = 3
   x, y, self.width, self.height = quad:getViewport()
   self.offsetX = -(self.scale*self.width*0.6)/2
@@ -61,6 +65,9 @@ function Enemy:hit()
   self.health = self.health - 1
   if(self.quad2 ~= nil) then
     self.quad = self.quad2
+  end
+  if (self.health == 0) then
+    self.sound:play()
   end
   return (self.health <= 0)
 end

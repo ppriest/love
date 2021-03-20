@@ -1,4 +1,7 @@
+require 'slam'
+
 local game = {}
+
 local cron = require "cron"
 
 local utilities = require("utilities")
@@ -9,6 +12,9 @@ local Enemy = require("enemy")
 local enemyImage
 local enemyQuad = {}
 local rainbow
+local music
+local shotSound
+local deathSound
 
 -- game objects
 local shots
@@ -23,7 +29,7 @@ local score
 local flagStopped
 local flagGameover
 local flagWin
-local groundHeight = 465
+local groundHeight = 540
 local winTime
 local gameTime
 
@@ -64,6 +70,9 @@ function game.shoot()
     shotDrone.sp = shotSpeed
     table.insert(shots, shotDrone)
   end
+  
+  local instance = shotSound:play()
+  instance:setPitch(.5 + math.random() * .5)
 end
 
 function game.chooseShotType(mode)
@@ -149,6 +158,13 @@ function game.load(gameX, gameY)
   --drone
   enemyQuad[12] = love.graphics.newQuad(96,0,16,16,enemyImage:getDimensions())
 
+  music = love.audio.newSource("sounds/Blear Moon - Winter journal.mp3", "stream")
+  --music:setVolume(0.9) -- 90% of ordinary volume
+  --music:setPitch(0.5) -- one octave lower
+  --music:setVolume(0.7)
+  
+  shotSound = love.audio.newSource("sounds/344310__musiclegends__laser-shoot.wav", "static")
+  deathSound = love.audio.newSource("sounds/448226__inspectorj__explosion-8-bit-01.wav", "static")
   
   game.reload(gameX, gameY)
 end
@@ -160,6 +176,9 @@ function game.reload(gameX, gameY)
   score = 0
   winTime = -1
   gameTime = 0
+
+  music:stop()
+  music:play()
 
   shots = {} -- holds our fired shots
  
@@ -174,24 +193,24 @@ function game.reload(gameX, gameY)
   
   -- enemies
   for i=0,6 do
-    local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, enemyImage, enemyQuad[1])
+    local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, deathSound, enemyImage, enemyQuad[1])
     table.insert(enemies, enemy)
   end
 
   -- hardenemies
   for i=0,10 do
-    local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, enemyImage, enemyQuad[2], enemyQuad[3])
+    local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, deathSound, enemyImage, enemyQuad[2], enemyQuad[3])
     table.insert(enemies, enemy)
   end
     
   -- sneakyenemies
   for i=0,2 do
-    local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, enemyImage, enemyQuad[4], enemyQuad[5])
+    local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, deathSound, enemyImage, enemyQuad[4], enemyQuad[5])
     table.insert(enemies, enemy)
   end
   
   -- boss
-  local enemy = Enemy(gameX/2 - 32/2, 20, 2, 50, 10, enemyImage, enemyQuad[7], enemyQuad[8])
+  local enemy = Enemy(gameX/2 - 32/2, 20, 2, 50, 10, deathSound, enemyImage, enemyQuad[7], enemyQuad[8])
   table.insert(enemies, enemy)
 end
 
