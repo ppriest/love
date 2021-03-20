@@ -158,7 +158,7 @@ function game.load(gameX, gameY)
   enemyQuad[12] = love.graphics.newQuad(80,0,16,16,enemyImage:getDimensions())
   
   --drone
-  enemyQuad[12] = love.graphics.newQuad(96,0,16,16,enemyImage:getDimensions())
+  enemyQuad[13] = love.graphics.newQuad(96,0,16,16,enemyImage:getDimensions())
 
   music = love.audio.newSource("sounds/Blear Moon - Winter journal.mp3", "stream")
   --music:setVolume(0.9) -- 90% of ordinary volume
@@ -184,9 +184,8 @@ function game.reload(gameX, gameY)
 
   shots = {} -- holds our fired shots
   game.chooseShotType(1)
-  hero = Hero(400, groundHeight-15) 
-  drone = Hero(400, groundHeight-15, 450) 
-  drone:setColor(0,0.8,0.8,1)
+  hero = Hero(400, groundHeight-15, 150, enemyImage, enemyQuad[12]) 
+  drone = Hero(400, groundHeight-15, 450, enemyImage, enemyQuad[13]) 
   
   level = 1
   enemies = {}
@@ -345,12 +344,6 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.draw(rainbow, 0, 0, 0, gameX, gameY)
   end
 
-  -- let's draw our hero
-  hero:draw()
-  if shotType == 5 then
-    drone:draw()
-  end
-
   -- let's draw our enemies
   for i,enemy in ipairs(enemies) do
     enemy:draw()
@@ -359,6 +352,12 @@ function game.draw(gameX, gameY)  -- let's draw a background
   -- let's draw some ground _over_ the enemies
   love.graphics.setColor(0,0.6,0,1.0)
   love.graphics.rectangle("fill", 0, groundHeight, gameX, gameY-groundHeight)
+  
+  -- let's draw our hero
+  if shotType == 5 then
+    drone:draw()
+  end
+  hero:draw()
    
    -- shots on top of actors
   love.graphics.setColor(0.5,0.5,0.5,1)

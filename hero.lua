@@ -1,15 +1,26 @@
 local Hero = Object:extend()
 
-function Hero:new(x, y, speed)
+function Hero:new(x, y, speed, image, quad)
   self.x = x or 0
   self.y = y or 0
   self.height = 15
   self.width = 30
   self.speed = speed or 150
+  self.image = image or nil
+  self.quad = quad or nil
+  
+  -- scale up the graphics
+  -- hitbox is smaller than enemy, and centered
+  self.scale = 3
+  x, y, self.width, self.height = quad:getViewport()
+  self.offsetX = -(self.scale*self.width*0.6)/2
+  self.offsetY = -(self.scale*self.height*0.6)/2
+  self.width = self.width*self.scale*0.4
+  self.height= self.height*self.scale*0.4
   
   self.r = 1
   self.g = 1
-  self.b = 0
+  self.b = 1
   self.a = 1
 end
 
@@ -48,7 +59,10 @@ end
 
 function Hero:draw()
   love.graphics.setColor(self.r,self.g,self.b,self.a)
-  love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+  love.graphics.draw(self.image, self.quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.cale)
+  
+  -- hitbox
+  --love.graphics.rectangle("line", self.x, self.y, self.width, self.height)    
 end
 
 return Hero
