@@ -17,7 +17,7 @@ local Enemy = require("enemy")
 -- resources
 local enemyImage
 local enemyQuad = {}
-local rainbow
+local gradient
 local music
 local music2
 local shotSound
@@ -127,13 +127,12 @@ end
 function game.load(gameX, gameY)
   love.graphics.setDefaultFilter("nearest", "nearest")
   
-  rainbow = utilities.gradientMesh("horizontal",
+  gradient = utilities.gradientMesh("horizontal",
         {1, 0, 0},
         {1, 1, 0},
-        {0, 1, 0},
-        {0, 1, 1},
-        {0, 0, 1},
-        {1, 0, 0}
+        {1, 0, 0},
+        {1, 1, 0},
+        {1, 0, 0} 
   )
   
   enemyImage = love.graphics.newImage("art/gfx.png")
@@ -354,7 +353,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
   if(flagWin) then
     local alpha = (gameTime-winTime)/5
     love.graphics.setColor(1,1,1,alpha) 
-    love.graphics.draw(rainbow, 0, 0, 0, gameX, gameY)
+    love.graphics.draw(gradient, 0, 0, 0, gameX, gameY)
   end
 
   -- let's draw our enemies
