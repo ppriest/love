@@ -132,8 +132,8 @@ function game.load(gameX, gameY)
 end
 
 function game.reload(gameX, gameY)
-  flagStopped = true
-  flagGameover = true
+  flagStopped = false
+  flagGameover = false
   flagWin = false
   score = 0
   winTime = -1
