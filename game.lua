@@ -121,6 +121,7 @@ function game.load()
   enemyImage = love.graphics.newImage("gfx.png")
   enemyQuad[1] = love.graphics.newQuad(16,0,16,16,enemyImage:getDimensions())
   enemyQuad[2] = love.graphics.newQuad(0,0,16,16,enemyImage:getDimensions())
+  enemyQuad[3] = love.graphics.newQuad(16,16,16,16,enemyImage:getDimensions())
   
   game.reload()
 end
@@ -144,13 +145,13 @@ function game.reload()
   
   -- first row
   for i=0,10 do
-    local enemy = Enemy(i*70 + 30, 120, 3, 1, enemyImage, enemyQuad[1])
+    local enemy = Enemy(i*70 + 30, 120, 3, 5, 1, enemyImage, enemyQuad[1], enemyQuad[3])
     table.insert(enemies, enemy)
   end
   
   -- second row
   for i=0,6 do
-    local enemy = Enemy(i*90 + 100, 180, 10, 3, enemyImage, enemyQuad[2])
+    local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, enemyImage, enemyQuad[2])
     table.insert(enemies, enemy)
   end
 end
@@ -219,8 +220,10 @@ function game.update(dt, gameX, gameY)
     for ii,enemy in ipairs(enemies) do
       if utilities.checkBoxCollision(shot.x,shot.y,2,5,enemy:getX(),enemy:getY(),enemy:getWidth(),enemy:getHeight()) then
         score = score + enemy:getScore()
-         -- mark that enemy for removal
-        table.insert(remEnemy, ii)
+        if(enemy:hit()) then
+          -- mark that enemy for removal
+          table.insert(remEnemy, ii)
+        end
         -- mark the shot to be removed
         table.insert(remShot, i)
       end

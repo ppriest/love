@@ -1,14 +1,16 @@
 local Enemy = Object:extend()
 
-function Enemy:new(x, y, speed, score, image, quad)
+function Enemy:new(x, y, speed, health, score, image, quad, quad2)
   self.x = x or 0
   self.y = y or 0
   self.height = 20
   self.width = 40
   self.speed = speed or 1
+  self.health = health or 1
   self.score = score or 1
   self.image = image or nil
   self.quad = quad or nil
+  self.quad2 = quad2 or nil
   
   self.r = 1
   self.g = 1
@@ -43,9 +45,20 @@ function Enemy:getScore()
   return self.score
 end
 
+function Enemy:getHealth()
+  return self.health
+end
 
 function Enemy:update(dt)
-    self.y = self.y + dt*self.speed
+  self.y = self.y + dt*self.speed
+end
+
+function Enemy:hit()
+  self.health = self.health - 1
+  if(self.quad2 ~= nil) then
+    self.quad = self.quad2
+  end
+  return (self.health <= 0)
 end
 
 function Enemy:draw()
