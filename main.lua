@@ -1,5 +1,5 @@
 Object = require "classic"
-require "sstrict/sstrict"
+--require "sstrict/sstrict"
 local globals = require("globals")
 
 local game = require("game")
@@ -72,7 +72,7 @@ function love.load(arg)
   print("love.load()")
   print("  winWidth: " .. winWidth)
   print("  winHeight: " .. winHeight)
-  initDisplay(false)
+  initDisplay(true)
   
   game.load(gameX, gameY)
 end
@@ -83,11 +83,11 @@ function love.keypressed(k)
   if digit >= 0 and digit <= 9 then -- switch weapons
     game.chooseShotType(digit)
   elseif k == 'escape' then -- fullscreen->window->quit
-    if fullscreen then
-      initDisplay(false)
-    else
+    --if fullscreen then
+    --  initDisplay(false)
+    --else
       love.event.quit()
-    end
+    --end
   elseif k == 'f' or (k == 'return' and love.keyboard.isDown("ralt")) then -- toggle fullscreen
     initDisplay(not fullscreen)
   elseif k == 'r' then -- reset
