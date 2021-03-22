@@ -6,6 +6,7 @@ require 'slam'
 -- Item boxes
 -- Network play
 
+
 local game = {}
 
 local cron = require "cron"
@@ -13,6 +14,7 @@ local cron = require "cron"
 local utilities = require("utilities")
 local Hero = require("hero")
 local Enemy = require("enemy")
+local EnemyRed = require("enemy_red")
 
 -- resources
 local image1
@@ -147,6 +149,10 @@ function game.load(gameX, gameY)
   image1Quads["black_damage1"] = love.graphics.newQuad(32,16,16,16,image1:getDimensions())
   image1Quads["black_damage2"] = love.graphics.newQuad(32,32,16,16,image1:getDimensions())
   
+  -- purple
+  image1Quads["purple"] = love.graphics.newQuad(0,64,48,16,image1:getDimensions())
+  image1Quads["purple_damage1"] = love.graphics.newQuad(0,80,48,16,image1:getDimensions())
+  
   -- boss
   image1Quads["boss"] = love.graphics.newQuad(48,0,32,32,image1:getDimensions())
   image1Quads["boss_damage"] = love.graphics.newQuad(48,32,32,32,image1:getDimensions())
@@ -162,8 +168,11 @@ function game.load(gameX, gameY)
   image1Quads["hero"] = love.graphics.newQuad(80,0,16,16,image1:getDimensions())
   
   --drone
-  image1Quads["drone"] = love.graphics.newQuad(96,0,16,16,image1:getDimensions())
-
+  image1Quads["drone1"] = love.graphics.newQuad (96,0,16,16,image1:getDimensions())
+  image1Quads["drone2"] = love.graphics.newQuad (96,16,16,16,image1:getDimensions())
+  image1Quads["drone3"] = love.graphics.newQuad (96,32,16,16,image1:getDimensions())
+  image1Quads["drone4"] = love.graphics.newQuad (96,48,16,16,image1:getDimensions())
+  image1Quads["drone5"] = love.graphics.newQuad (96,64,16,16,image1:getDimensions())
   music["dramatic"] = love.audio.newSource("sounds/538828__puredesigngirl__dramatic-music.mp3", "stream")
   music["bossfight"] = love.audio.newSource("sounds/251415__tritus__fight-loop.ogg", "stream")
   --music[]:setVolume(0.9) -- 90% of ordinary volume
@@ -187,7 +196,7 @@ function game.reload(gameX, gameY)
   shots = {} -- holds our fired shots
   game.chooseShotType(1)
   hero = Hero(400, groundHeight-15, 150, image1, image1Quads["hero"]) 
-  drone = Hero(400, groundHeight-15, 450, image1, image1Quads["drone"]) 
+  drone = Hero(400, groundHeight-15, 450, image1, image1Quads["drone1"]) 
   
   level = 1
   enemies = {}
@@ -201,16 +210,23 @@ function game.spawnEnemies(gameX, gameY)
   if level == 1 then
     musicNew = "dramatic"
       
-    -- red
+    -- blue
     for i=0,6 do
       local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, sound["death"], image1, image1Quads["blue"])
       table.insert(enemies, enemy)
     end
 
-    -- blue
+    -- red
     for i=0,10 do
       local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, sound["death"], image1, image1Quads["red"], image1Quads["red_damage"])
+      --local enemy = EnemyRed(i*70 + 30, 120)
       table.insert(enemies, enemy)
+    end
+    
+    -- purple
+    for i=0,2 do
+     local enemy2 = Enemy(i*250 + 100, 250, 8, 12, 10, sound["death"], image1, image1Quads["purple"], image1Quads["purple_damage1"])
+     table.insert(enemies, enemy2)
     end
           
   elseif level == 2 then
@@ -218,13 +234,14 @@ function game.spawnEnemies(gameX, gameY)
     
     -- boss
     local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, sound["death"], image1, image1Quads["boss"], image1Quads["boss_damage"])
-    table.insert(enemies, enemy)
+    table.insert(enemies, enemy) 
   
     -- black
     for i=0,2 do
       local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, sound["death"], image1, image1Quads["black"], image1Quads["black_damage1"])
       table.insert(enemies, enemy)
     end
+  
   else
     if(winTime < 0) then
       winTime = gameTime
