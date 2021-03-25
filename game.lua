@@ -5,6 +5,8 @@ require 'slam'
 -- Enemy spawner
 -- Item boxes
 -- Network play
+-- Mess with shaders for final effects, and also https://love2d.org/forums/viewtopic.php?t=79617
+-- Joystick support
 
 local game = {}
 
