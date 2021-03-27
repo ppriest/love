@@ -14,6 +14,8 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
   self.healthDamage = healthDamage or -1
   self.quadName2 = quadName2 or nil
   
+  print('speed: ' .. self.speed .. ' health: ' .. self.health)
+  
   -- scale up the graphics
   -- hitbox is smaller than enemy, and centered
   local image, quad = resource_manager.getQuad(self.quadName)
@@ -28,6 +30,8 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
   self.g = 1
   self.b = 1
   self.a = 1
+
+  self.time = 0
 end
 
 function Enemy:setColor(r, g, b, a)
@@ -62,7 +66,9 @@ function Enemy:getHealth()
 end
 
 function Enemy:update(dt)
+  self.time = self.time + dt
   self.y = self.y + dt*self.speed
+  print('self.y: ' .. self.y .. 'speed: ' .. self.speed .. ' dt: ' .. dt)
 end
 
 function Enemy:hit(disable)

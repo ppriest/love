@@ -57,11 +57,12 @@ function ShotObject:update(dt, game_x, game_y)
     loopComplete = true
   end
   
-  local animFrame = math.floor(self.time*10) % 2
-  self.image, self.quad = resource_manager.getQuad("glaive" .. (animFrame+1))
+  local animFrame = (math.floor(self.time*10) % 2) + 1
+  self.image, self.quad = resource_manager.getQuad("glaive" .. animFrame)
   
+  -- don't allow removal until completed arc
   if loopComplete and (self.y < 0 or self.y >= game_y or self.x < 0 or self.x > game_x) then
-    return true
+    return true 
   end
   return false
 end

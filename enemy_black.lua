@@ -1,10 +1,18 @@
 local Enemy = require("enemy")
 local resource_manager = require("resource_manager")
 
+local alphaMin = 0.34
+
 local EnemyBlack = Enemy:extend()
 
 function EnemyBlack:new(x, y)
   EnemyBlack.super.new(self, x, y, 50, 3, 6, "death", "black")
+end
+
+function EnemyBlack:update(dt)
+  self.time = self.time + dt
+  self.y = self.y + dt*self.speed
+  self.a = (math.sin(self.time)*alphaMin + (1-alphaMin))
 end
 
 function EnemyBlack:hit(disable)  

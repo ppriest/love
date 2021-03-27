@@ -29,6 +29,7 @@ local drone
 local shots
 local shotObjects
 local enemies
+local enemiesNextWave
 local maxShotNumber
 local shotSpeed
 local shotType
@@ -43,6 +44,8 @@ local groundHeight = 540
 local winTime
 local gameTime
 local totalShotCount
+local totalEnemiesKilledThisLevel
+local enemyKillTrigger
 
 local easyMode = false
 local startLevel = 1
@@ -172,13 +175,15 @@ function game.reload(gameX, gameY)
   
   level = startLevel
   enemies = {}
+  enemiesNextWave = {}
   game.spawnEnemies(gameX, gameY)
   shotObjects = {}
 end
 
 function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
-  
+  totalEnemiesKilledThisLevel = 0
+  enemyKillTrigger = 0
   if easyMode then
     if level == 1 then
       music = "dramatic"
@@ -200,19 +205,16 @@ function game.spawnEnemies(gameX, gameY)
     if level == 1 then
       music = "dramatic"
         
-      -- blue
       for i=0,6 do
         local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, "death", "blue")
         table.insert(enemies, enemy)
       end
 
-      -- red
       for i=0,10 do
         local enemy = EnemyRed(i*70 + 30, 120)
         table.insert(enemies, enemy)
       end
       
-      -- purple
       for i=0,2 do
        local enemy2 = EnemyPurple(i*250 + 100, 250)
        table.insert(enemies, enemy2)
@@ -224,13 +226,19 @@ function game.spawnEnemies(gameX, gameY)
       local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
       table.insert(enemies, enemy) 
     
-      -- black
       for i=0,2 do
         local enemy = EnemyBlack(i*110 + 100, 40)
         table.insert(enemies, enemy)
       end
-    
+      
+      for i=0,2 do
+        local enemy = EnemyBlack(gameX - (i*110 + 100), 40)
+        table.insert(enemiesNextWave, enemy)
+      end
+      enemyKillTrigger = 3
+   
     else
+      -- music = "win"
       if(winTime < 0) then
         winTime = gameTime
       end
@@ -279,7 +287,7 @@ function game.update(dt, gameX, gameY)
       local enemyX = shot.x
 
       -- find closest
-      --!strict
+
       for ii,enemy in ipairs(enemies) do
         if ((math.abs(shot.x - enemy.x) < enemyDist) or enemyDist == 9999) then
           enemyDist = math.abs(shot.x - enemy.x)
@@ -339,6 +347,8 @@ function game.update(dt, gameX, gameY)
   -- remove the marked enemies and shots
   for i,enemy in ipairs(remEnemy) do
     table.remove(enemies, enemy)
+    totalEnemiesKilledThisLevel = totalEnemiesKilledThisLevel + 1
+    print('totalEnemiesKilledThisLevel: ' .. totalEnemiesKilledThisLevel)
   end
   for i,shot in ipairs(remShot) do
     table.remove(shots, shot)
@@ -361,6 +371,14 @@ function game.update(dt, gameX, gameY)
     if enemy:getY() > groundHeight then
       flagStopped = true
       flagGameover = true
+    end
+  end
+  
+  -- spawn more enemies
+  if (totalEnemiesKilledThisLevel == enemyKillTrigger) then
+    for i,enemy in ipairs(enemiesNextWave) do
+      table.insert(enemies, enemy)
+      enemiesNextWave[i] = nil
     end
   end
   
