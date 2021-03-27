@@ -65,7 +65,11 @@ function Enemy:update(dt)
   self.y = self.y + dt*self.speed
 end
 
-function Enemy:hit()
+function Enemy:hit(disable)
+  if disable then
+    self.speed = 0
+  end
+  
   if(self.quadName2 ~= nil and self.healthDamage == self.health) then
     self.quadName = self.quadName2
   end

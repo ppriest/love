@@ -55,6 +55,10 @@ function game.shoot()
   shot.x = hx
   shot.y = hy
   shot.sp = shotSpeed
+  shot.disable = false
+ if shotType == 7 then
+    shot.disable = true
+  end
   table.insert(shots, shot)
   
   if shotType == 2 then
@@ -62,12 +66,14 @@ function game.shoot()
    shot2.x = hx+10
    shot2.y = hy+10
    shot2.sp = shotSpeed
+   shot2.disable = false
    table.insert(shots, shot2)
    
    local shot3 = {}
    shot3.x = hx-10
    shot3.y = hy+10
    shot3.sp = shotSpeed
+   shot3.disable = false
    table.insert(shots, shot3)
   end
   
@@ -79,6 +85,7 @@ function game.shoot()
     shotDrone.x = dx
     shotDrone.y = dy
     shotDrone.sp = shotSpeed
+    shotDrone.disable = false
     table.insert(shots, shotDrone)
   end
   
@@ -91,7 +98,7 @@ function game.chooseShotType(mode)
     return
   end
   
-  mode = mode or love.math.random(1,6)
+  mode = mode or love.math.random(1,7)
   shotType = mode
 
   if shotType == 1 then -- normal
@@ -112,6 +119,9 @@ function game.chooseShotType(mode)
   elseif shotType == 6 then -- drone
     shotSpeed = 1500
     maxShotNumber = 1
+  elseif shotType == 7 then -- disable
+    shotSpeed = 120
+    maxShotNumber = 3
   else
     shotSpeed = 0
     maxShotNumber = 0
@@ -119,7 +129,7 @@ function game.chooseShotType(mode)
 end
 
 function game.shotString(localShotType)
-  local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper" }
+  local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper", "Disable" }
   if localShotType >= 1 and localShotType <= #shotStrings then
     return shotStrings[localShotType]
   end
@@ -243,7 +253,7 @@ function game.update(dt, gameX, gameY)
 
   -- update the shots
   for i,shot in ipairs(shots) do
-    -- move them up up up
+    -- move the bullets
     shot.y = shot.y - dt*shot.sp
 
     if(shotType == 4) then 
@@ -279,7 +289,7 @@ function game.update(dt, gameX, gameY)
     -- check for collision with enemies
     for ii,enemy in ipairs(enemies) do
       if utilities.checkBoxCollision(shot.x,shot.y,2,5,enemy:getX(),enemy:getY(),enemy:getWidth(),enemy:getHeight()) then
-        if(enemy:hit()) then
+        if(enemy:hit(shot.disable)) then
           -- mark that enemy for removal
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()

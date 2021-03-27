@@ -7,8 +7,11 @@ function EnemyBoss:new(x, y)
   EnemyBoss.super.new(self, x, y, 6, 50, 10, "death", "boss")
 end
 
-function EnemyBoss:hit()  
-
+function EnemyBoss:hit(disable)  
+  if disable then
+    self.speed = 0
+  end
+  
   self.health = self.health - 1
   if (self.health == 0) then
     resource_manager.playSound(self.soundName)
