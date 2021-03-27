@@ -19,6 +19,8 @@ local Hero = require("hero")
 local Enemy = require("enemy")
 local EnemyRed = require("enemy_red")
 local EnemyBoss = require("enemy_boss")
+local EnemyBlack = require("enemy_black")
+local EnemyPurple = require("enemy_purple")
 
 -- game objects
 local shots
@@ -39,7 +41,8 @@ local groundHeight = 540
 local winTime
 local gameTime
 
-local easyMode = true
+local easyMode = false
+local startLevel = 1
 
 
 function game.shoot()
@@ -142,7 +145,7 @@ function game.reload(gameX, gameY)
   hero = Hero(400, groundHeight-15, 150, "hero") 
   drone = Hero(400, groundHeight-15, 450, "drone1") 
   
-  level = 1
+  level = startLevel
   enemies = {}
   game.spawnEnemies(gameX, gameY)
 end
@@ -179,28 +182,25 @@ function game.spawnEnemies(gameX, gameY)
 
       -- red
       for i=0,10 do
-        --local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, "death", "red", "red_damage")
         local enemy = EnemyRed(i*70 + 30, 120)
         table.insert(enemies, enemy)
       end
       
       -- purple
       for i=0,2 do
-       local enemy2 = Enemy(i*250 + 100, 250, 8, 12, 10, "death", "purple", "purple_damage1")
+       local enemy2 = EnemyPurple(i*250 + 100, 250)
        table.insert(enemies, enemy2)
       end
             
     elseif level == 2 then
       music = "bossfight"
       
-      -- boss
-      --local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, "death", "boss", "boss_damage")
       local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
       table.insert(enemies, enemy) 
     
       -- black
       for i=0,2 do
-        local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, "death", "black", "black_damage1")
+        local enemy = EnemyBlack(i*110 + 100, 40)
         table.insert(enemies, enemy)
       end
     

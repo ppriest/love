@@ -1,7 +1,9 @@
 local Enemy = Object:extend()
 local resource_manager = require("resource_manager")
 
-function Enemy:new(x, y, speed, health, score, soundName, quadName, quadName2)
+local showHitbox = false
+
+function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage, quadName2)
   self.x = x or 0
   self.y = y or 0
   self.speed = speed or 1
@@ -9,6 +11,7 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, quadName2)
   self.score = score or 1
   self.soundName = soundName
   self.quadName = quadName or nil
+  self.healthDamage = healthDamage or -1
   self.quadName2 = quadName2 or nil
   
   -- scale up the graphics
@@ -63,7 +66,7 @@ function Enemy:update(dt)
 end
 
 function Enemy:hit()
-  if(self.quadName2 ~= nil) then
+  if(self.quadName2 ~= nil and self.healthDamage == self.health) then
     self.quadName = self.quadName2
   end
   
@@ -80,8 +83,9 @@ function Enemy:draw()
   love.graphics.setColor(self.r,self.g,self.b,self.a)
   love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.cale)
   
-  -- hitbox
-  -- love.graphics.rectangle("line", self.x, self.y, self.width, self.height)    
+  if showHitbox then
+    love.graphics.rectangle("line", self.x, self.y, self.width, self.height) 
+  end
 end
 
 return Enemy
