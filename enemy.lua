@@ -63,15 +63,17 @@ function Enemy:update(dt)
 end
 
 function Enemy:hit()
-  self.health = self.health - 1
   if(self.quadName2 ~= nil) then
     self.quadName = self.quadName2
   end
+  
+  self.health = self.health - 1
   if (self.health == 0) then
     resource_manager.playSound(self.soundName)
   end
   return (self.health <= 0)
 end
+
 
 function Enemy:draw()
   local image, quad = resource_manager.getQuad(self.quadName)

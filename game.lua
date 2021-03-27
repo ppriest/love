@@ -18,6 +18,7 @@ local resource_manager = require("resource_manager")
 local Hero = require("hero")
 local Enemy = require("enemy")
 local EnemyRed = require("enemy_red")
+local EnemyBoss = require("enemy_boss")
 
 -- game objects
 local shots
@@ -38,7 +39,7 @@ local groundHeight = 540
 local winTime
 local gameTime
 
-local easyMode = false
+local easyMode = true
 
 
 function game.shoot()
@@ -156,7 +157,7 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemies, enemy)
     elseif level == 2 then
       music = "bossfight"
-      local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, "death", "boss", "boss_damage")
+      local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
       table.insert(enemies, enemy)
     else
       if(winTime < 0) then
@@ -193,7 +194,8 @@ function game.spawnEnemies(gameX, gameY)
       music = "bossfight"
       
       -- boss
-      local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, "death", "boss", "boss_damage")
+      --local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, "death", "boss", "boss_damage")
+      local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
       table.insert(enemies, enemy) 
     
       -- black
