@@ -85,7 +85,7 @@ end
 function Enemy:draw()
   local image, quad = resource_manager.getQuad(self.quadName)
   love.graphics.setColor(self.r,self.g,self.b,self.a)
-  love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.cale)
+  love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
   
   if showHitbox then
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height) 

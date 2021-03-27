@@ -61,7 +61,7 @@ end
 
 function Hero:draw()
   love.graphics.setColor(self.r,self.g,self.b,self.a)
-  love.graphics.draw(self.image, self.quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.cale)
+  love.graphics.draw(self.image, self.quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
   
   -- hitbox
   --love.graphics.rectangle("line", self.x, self.y, self.width, self.height)    

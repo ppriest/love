@@ -21,12 +21,14 @@ local EnemyRed = require("enemy_red")
 local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
+local ShotObject = require("shot_object")
 
 -- game objects
-local shots
 local hero
 local drone
-local enemies = {}
+local shots
+local shotObjects
+local enemies
 local maxShotNumber
 local shotSpeed
 local shotType
@@ -40,53 +42,62 @@ local flagWin
 local groundHeight = 540
 local winTime
 local gameTime
+local totalShotCount
 
 local easyMode = false
 local startLevel = 1
 
 
 function game.shoot()
-  if #shots >= maxShotNumber then return end
+  if (#shots + #shotObjects) >= maxShotNumber then return end
+  totalShotCount = totalShotCount + 1
   
   local hx = hero:getX()+hero:getWidth()/2
   local hy = hero:getY()
-  
-  local shot = {}
-  shot.x = hx
-  shot.y = hy
-  shot.sp = shotSpeed
-  shot.disable = false
- if shotType == 7 then
-    shot.disable = true
-  end
-  table.insert(shots, shot)
-  
-  if shotType == 2 then
-   local shot2 = {}
-   shot2.x = hx+10
-   shot2.y = hy+10
-   shot2.sp = shotSpeed
-   shot2.disable = false
-   table.insert(shots, shot2)
-   
-   local shot3 = {}
-   shot3.x = hx-10
-   shot3.y = hy+10
-   shot3.sp = shotSpeed
-   shot3.disable = false
-   table.insert(shots, shot3)
-  end
-  
-  if shotType == 5 then
-    local dx = drone:getX()+drone:getWidth()/2
-    local dy = drone:getY()
+
+  if (shotType <= 7) then
+    local shot = {}
+    shot.x = hx
+    shot.y = hy
+    shot.sp = shotSpeed
+    shot.disable = false
+    if shotType == 7 then
+      shot.disable = true
+    end
+    table.insert(shots, shot)
     
-    local shotDrone = {}
-    shotDrone.x = dx
-    shotDrone.y = dy
-    shotDrone.sp = shotSpeed
-    shotDrone.disable = false
-    table.insert(shots, shotDrone)
+    if shotType == 2 then
+     local shot2 = {}
+     shot2.x = hx+10
+     shot2.y = hy+10
+     shot2.sp = shotSpeed
+     shot2.disable = false
+     table.insert(shots, shot2)
+     
+     local shot3 = {}
+     shot3.x = hx-10
+     shot3.y = hy+10
+     shot3.sp = shotSpeed
+     shot3.disable = false
+     table.insert(shots, shot3)
+    end
+    
+    if shotType == 5 then
+      local dx = drone:getX()+drone:getWidth()/2
+      local dy = drone:getY()
+      
+      local shotDrone = {}
+      shotDrone.x = dx
+      shotDrone.y = dy
+      shotDrone.sp = shotSpeed
+      shotDrone.disable = false
+      table.insert(shots, shotDrone)
+    end
+    
+  elseif (shotType == 8) then
+      local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
+      local shotObject = ShotObject(hx, hy, dir)
+      table.insert(shotObjects, shotObject)
   end
   
   local instance = resource_manager.playSound("shot")
@@ -98,7 +109,7 @@ function game.chooseShotType(mode)
     return
   end
   
-  mode = mode or love.math.random(1,7)
+  mode = mode or love.math.random(1,8)
   shotType = mode
 
   if shotType == 1 then -- normal
@@ -122,6 +133,9 @@ function game.chooseShotType(mode)
   elseif shotType == 7 then -- disable
     shotSpeed = 120
     maxShotNumber = 3
+  elseif shotType == 8 then -- glaive
+    shotSpeed = 0
+    maxShotNumber = 3
   else
     shotSpeed = 0
     maxShotNumber = 0
@@ -129,7 +143,7 @@ function game.chooseShotType(mode)
 end
 
 function game.shotString(localShotType)
-  local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper", "Disable" }
+  local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper", "Disable", "Glaive" }
   if localShotType >= 1 and localShotType <= #shotStrings then
     return shotStrings[localShotType]
   end
@@ -149,6 +163,7 @@ function game.reload(gameX, gameY)
   score = 0
   winTime = -1
   gameTime = 0
+  totalShotCount = 0
 
   shots = {} -- holds our fired shots
   game.chooseShotType(1)
@@ -158,6 +173,7 @@ function game.reload(gameX, gameY)
   level = startLevel
   enemies = {}
   game.spawnEnemies(gameX, gameY)
+  shotObjects = {}
 end
 
 function game.spawnEnemies(gameX, gameY)
@@ -250,6 +266,7 @@ function game.update(dt, gameX, gameY)
 
   local remEnemy = {}
   local remShot = {}
+  local remShotObject = {}
 
   -- update the shots
   for i,shot in ipairs(shots) do
@@ -282,7 +299,7 @@ function game.update(dt, gameX, gameY)
     end
 
     -- mark shots that are not visible for removal
-    if shot.y < 0 then
+    if (shot.y < 0 or shot.y >= gameY or shot.x < 0 or shot.x > gameX) then
       table.insert(remShot, i)
     end
 
@@ -299,6 +316,25 @@ function game.update(dt, gameX, gameY)
       end
     end
   end
+  
+  -- fancy shots
+  for i,shot in ipairs(shotObjects) do
+    if shot:update(dt, gameX, gameY) then
+      table.insert(remShotObject, i)
+    end
+    
+        -- check for collision with enemies
+    for ii,enemy in ipairs(enemies) do
+      if utilities.checkBoxCollisionC(shot, enemy) then
+        if(enemy:hit(shot.disable)) then
+          -- mark that enemy for removal
+          table.insert(remEnemy, ii)
+          score = score + enemy:getScore()
+        end
+      end
+    end
+
+  end
 
   -- remove the marked enemies and shots
   for i,enemy in ipairs(remEnemy) do
@@ -306,6 +342,9 @@ function game.update(dt, gameX, gameY)
   end
   for i,shot in ipairs(remShot) do
     table.remove(shots, shot)
+  end    
+  for i,shot in ipairs(remShotObject) do
+    table.remove(shotObjects, shot)
   end    
   
   -- update the enemies' positions
@@ -363,7 +402,12 @@ function game.draw(gameX, gameY)  -- let's draw a background
   for i,v in ipairs(shots) do
     love.graphics.rectangle("fill", v.x, v.y, 2, 5)
   end 
- 
+  
+   -- draw fancy shots
+  for i,shot in ipairs(shotObjects) do
+    shot:draw()
+  end
+  
   -- draw overlay
   if(not flagStopped) then
     love.graphics.setColor(1,1,1,1)
