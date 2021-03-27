@@ -14,16 +14,10 @@ local game = {}
 local cron = require "cron"
 
 local utilities = require("utilities")
+local resource_manager = require("resource_manager")
 local Hero = require("hero")
 local Enemy = require("enemy")
 local EnemyRed = require("enemy_red")
-
--- resources
-local image1
-local image1Quads = {}
-local gradient
-local music = {}
-local sound = {}
 
 -- game objects
 local shots
@@ -43,6 +37,8 @@ local flagWin
 local groundHeight = 540
 local winTime
 local gameTime
+
+local easyMode = false
 
 
 function game.shoot()
@@ -82,7 +78,7 @@ function game.shoot()
     table.insert(shots, shotDrone)
   end
   
-  local instance = sound["shot"]:play()
+  local instance = resource_manager.playSound("shot")
   instance:setPitch(.5 + math.random() * .5)
 end
 
@@ -127,63 +123,8 @@ function game.shotString(localShotType)
 end
 
 function game.load(gameX, gameY)
-  love.graphics.setDefaultFilter("nearest", "nearest")
-  
-  gradient = utilities.gradientMesh("vertical",
-        {1, 0, 0},
-        {1, 1, 0},
-        {1, 0, 0},
-        {1, 1, 0},
-        {1, 0, 0} 
-  )
-  
-  image1 = love.graphics.newImage("art/gfx.png")
-  
-  -- blue
-  image1Quads["blue"] = love.graphics.newQuad(0,0,16,16,image1:getDimensions())
-  
-  -- red
-  image1Quads["red"] = love.graphics.newQuad(16,0,16,16,image1:getDimensions())
-  image1Quads["red_damage"] = love.graphics.newQuad(16,16,16,16,image1:getDimensions())
-  
-  -- black
-  image1Quads["black"] = love.graphics.newQuad(32,0,16,16,image1:getDimensions())
-  image1Quads["black_damage1"] = love.graphics.newQuad(32,16,16,16,image1:getDimensions())
-  image1Quads["black_damage2"] = love.graphics.newQuad(32,32,16,16,image1:getDimensions())
-  
-  -- purple
-  image1Quads["purple"] = love.graphics.newQuad(0,64,48,16,image1:getDimensions())
-  image1Quads["purple_damage1"] = love.graphics.newQuad(0,80,48,16,image1:getDimensions())
-  
-  -- boss
-  image1Quads["boss"] = love.graphics.newQuad(48,0,32,32,image1:getDimensions())
-  image1Quads["boss_damage"] = love.graphics.newQuad(48,32,32,32,image1:getDimensions())
-  image1Quads["boss_damage2"] = love.graphics.newQuad(48,64,32,32,image1:getDimensions())
-  
-  --urn rocket
-  image1Quads["urn"] = love.graphics.newQuad(0,64,16,16,image1:getDimensions())
-  
-  --red urn rocket
-  image1Quads["urn_red"] = love.graphics.newQuad(16,64,16,16,image1:getDimensions())
-  
-  --shooter
-  image1Quads["hero"] = love.graphics.newQuad(80,0,16,16,image1:getDimensions())
-  
-  --drone
-  image1Quads["drone1"] = love.graphics.newQuad (96,0,16,16,image1:getDimensions())
-  image1Quads["drone2"] = love.graphics.newQuad (96,16,16,16,image1:getDimensions())
-  image1Quads["drone3"] = love.graphics.newQuad (96,32,16,16,image1:getDimensions())
-  image1Quads["drone4"] = love.graphics.newQuad (96,48,16,16,image1:getDimensions())
-  image1Quads["drone5"] = love.graphics.newQuad (96,64,16,16,image1:getDimensions())
-  music["dramatic"] = love.audio.newSource("sounds/538828__puredesigngirl__dramatic-music.mp3", "stream")
-  music["bossfight"] = love.audio.newSource("sounds/251415__tritus__fight-loop.ogg", "stream")
-  --music[]:setVolume(0.9) -- 90% of ordinary volume
-  --music[]:setPitch(0.5) -- one octave lower
-  --music[]:setVolume(0.7)
-  
-  sound["shot"] = love.audio.newSource("sounds/344310__musiclegends__laser-shoot.wav", "static")
-  sound["death"] = love.audio.newSource("sounds/448226__inspectorj__explosion-8-bit-01.wav", "static")
-  
+  resource_manager.load()
+  love.graphics.setNewFont("fonts/Deadly Advance.ttf", 20)
   game.reload(gameX, gameY)
 end
 
@@ -197,68 +138,80 @@ function game.reload(gameX, gameY)
 
   shots = {} -- holds our fired shots
   game.chooseShotType(1)
-  hero = Hero(400, groundHeight-15, 150, image1, image1Quads["hero"]) 
-  drone = Hero(400, groundHeight-15, 450, image1, image1Quads["drone1"]) 
+  hero = Hero(400, groundHeight-15, 150, "hero") 
+  drone = Hero(400, groundHeight-15, 450, "drone1") 
   
   level = 1
   enemies = {}
   game.spawnEnemies(gameX, gameY)
 end
 
-local musicCurrent = ""
 function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
   
-  if level == 1 then
-    musicNew = "dramatic"
-      
-    -- blue
-    for i=0,6 do
-      local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, sound["death"], image1, image1Quads["blue"])
+  if easyMode then
+    if level == 1 then
+      music = "dramatic"
+      local enemy = Enemy(90 + 100, 180, 10, 1, 3, "death", "blue")
       table.insert(enemies, enemy)
-    end
-
-    -- red
-    for i=0,10 do
-      local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, sound["death"], image1, image1Quads["red"], image1Quads["red_damage"])
-      --local enemy = EnemyRed(i*70 + 30, 120)
+    elseif level == 2 then
+      music = "bossfight"
+      local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, "death", "boss", "boss_damage")
       table.insert(enemies, enemy)
-    end
-    
-    -- purple
-    for i=0,2 do
-     local enemy2 = Enemy(i*250 + 100, 250, 8, 12, 10, sound["death"], image1, image1Quads["purple"], image1Quads["purple_damage1"])
-     table.insert(enemies, enemy2)
-    end
-          
-  elseif level == 2 then
-    musicNew = "bossfight"
-    
-    -- boss
-    local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, sound["death"], image1, image1Quads["boss"], image1Quads["boss_damage"])
-    table.insert(enemies, enemy) 
-  
-    -- black
-    for i=0,2 do
-      local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, sound["death"], image1, image1Quads["black"], image1Quads["black_damage1"])
-      table.insert(enemies, enemy)
+    else
+      if(winTime < 0) then
+        winTime = gameTime
+      end
+      flagStopped = true
+      flagWin = true
     end
   
   else
-    if(winTime < 0) then
-      winTime = gameTime
+    if level == 1 then
+      music = "dramatic"
+        
+      -- blue
+      for i=0,6 do
+        local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, "death", "blue")
+        table.insert(enemies, enemy)
+      end
+
+      -- red
+      for i=0,10 do
+        --local enemy = Enemy(i*70 + 30, 120, 3, 3, 1, "death", "red", "red_damage")
+        local enemy = EnemyRed(i*70 + 30, 120)
+        table.insert(enemies, enemy)
+      end
+      
+      -- purple
+      for i=0,2 do
+       local enemy2 = Enemy(i*250 + 100, 250, 8, 12, 10, "death", "purple", "purple_damage1")
+       table.insert(enemies, enemy2)
+      end
+            
+    elseif level == 2 then
+      music = "bossfight"
+      
+      -- boss
+      local enemy = Enemy(gameX/2 - 32/2, 20, 4, 50, 10, "death", "boss", "boss_damage")
+      table.insert(enemies, enemy) 
+    
+      -- black
+      for i=0,2 do
+        local enemy = Enemy(i*110 + 100, 40, 50, 3, 6, "death", "black", "black_damage1")
+        table.insert(enemies, enemy)
+      end
+    
+    else
+      if(winTime < 0) then
+        winTime = gameTime
+      end
+      flagStopped = true
+      flagWin = true
     end
-    flagStopped = true
-    flagWin = true
   end
   
-  if(musicNew ~= musicCurrent) then
-    if(musicCurrent ~= "") then
-      music[musicCurrent]:stop()
-    end
-    music[musicNew]:play()
-    musicCurrent = musicNew
-  end
+  resource_manager.playMusic(music)
 end
 
 local timer = cron.every(10, game.chooseShotType)
@@ -375,7 +328,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
   if(flagWin) then
     local alpha = (gameTime-winTime)/5
     love.graphics.setColor(1,1,1,alpha) 
-    love.graphics.draw(gradient, 0, 0, 0, gameX, gameY)
+    love.graphics.draw(resource_manager.getGradient(), 0, 0, 0, gameX, gameY)
   end
 
   -- let's draw our enemies

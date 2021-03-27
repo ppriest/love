@@ -1,5 +1,5 @@
 Object = require "classic"
---require "sstrict/sstrict"
+require "sstrict/sstrict"
 local globals = require("globals")
 
 local game = require("game")
@@ -32,8 +32,6 @@ local mobile = false
   print("  targetWidth: " .. targetWidth)
   print("  targetHeight: " .. targetHeight)
  
- 
-  love.graphics.setNewFont("fonts/Deadly Advance.ttf", 20)
   love.resize(targetWidth, targetHeight)
 end
 
@@ -74,6 +72,8 @@ function love.load(arg)
   print("  winHeight: " .. winHeight)
   initDisplay(true)
   
+  love.graphics.setDefaultFilter("nearest", "nearest")
+
   game.load(gameX, gameY)
 end
 

@@ -1,18 +1,20 @@
 local Hero = Object:extend()
+local resource_manager = require("resource_manager")
 
-function Hero:new(x, y, speed, image, quad)
+function Hero:new(x, y, speed, quadName)
   self.x = x or 0
   self.y = y or 0
   self.height = 15
   self.width = 30
   self.speed = speed or 150
-  self.image = image or nil
-  self.quad = quad or nil
+  self.quadName = quadName or nil
+  self.image, self.quad = resource_manager.getQuad(self.quadName)
+
   
   -- scale up the graphics
   -- hitbox is smaller than enemy, and centered
   self.scale = 3
-  x, y, self.width, self.height = quad:getViewport()
+  x, y, self.width, self.height = self.quad:getViewport()
   self.offsetX = -(self.scale*self.width*0.6)/2
   self.offsetY = -(self.scale*self.height*0.6)/2
   self.width = self.width*self.scale*0.4

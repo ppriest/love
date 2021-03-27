@@ -1,18 +1,19 @@
 local Enemy = Object:extend()
+local resource_manager = require("resource_manager")
 
-function Enemy:new(x, y, speed, health, score, sound, image, quad, quad2)
+function Enemy:new(x, y, speed, health, score, soundName, quadName, quadName2)
   self.x = x or 0
   self.y = y or 0
   self.speed = speed or 1
   self.health = health or 1
   self.score = score or 1
-  self.sound = sound
-  self.image = image or nil
-  self.quad = quad or nil
-  self.quad2 = quad2 or nil
+  self.soundName = soundName
+  self.quadName = quadName or nil
+  self.quadName2 = quadName2 or nil
   
   -- scale up the graphics
   -- hitbox is smaller than enemy, and centered
+  local image, quad = resource_manager.getQuad(self.quadName)
   self.scale = 3
   x, y, self.width, self.height = quad:getViewport()
   self.offsetX = -(self.scale*self.width*0.6)/2
@@ -63,18 +64,19 @@ end
 
 function Enemy:hit()
   self.health = self.health - 1
-  if(self.quad2 ~= nil) then
-    self.quad = self.quad2
+  if(self.quadName2 ~= nil) then
+    self.quadName = self.quadName2
   end
   if (self.health == 0) then
-    self.sound:play()
+    resource_manager.playSound(self.soundName)
   end
   return (self.health <= 0)
 end
 
 function Enemy:draw()
+  local image, quad = resource_manager.getQuad(self.quadName)
   love.graphics.setColor(self.r,self.g,self.b,self.a)
-  love.graphics.draw(self.image, self.quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.cale)
+  love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.cale)
   
   -- hitbox
   -- love.graphics.rectangle("line", self.x, self.y, self.width, self.height)    
