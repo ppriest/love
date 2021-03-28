@@ -11,8 +11,8 @@ end
 function EnemyBoss:update(dt)
   EnemyBoss.super.update(self, dt)
   
-  self.r = (math.sin(self.time)*colourChange + (1-colourChange))
-  self.g = (math.cos(self.time)*colourChange + (1-colourChange))
+  --self.r = (math.sin(self.time)*colourChange + (1-colourChange))
+  --self.g = (math.cos(self.time)*colourChange + (1-colourChange))
   self.scale = (math.cos(self.time)*0.16 + 2.9)
   EnemyBoss.super.recalcScale(self)
 end

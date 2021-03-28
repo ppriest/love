@@ -52,6 +52,20 @@ local joystickDeadzone = 0.20
 local easyMode = false
 local startLevel = 1
 
+function game.droneShoot()
+  if (#shots + #shotObjects) >= maxShotNumber then return end
+     if shotType == 5 then
+      local dx = drone:getX()+drone:getWidth()/2
+      local dy = drone:getY()
+      
+      local shotDrone = {}
+      shotDrone.x = dx
+      shotDrone.y = dy
+      shotDrone.sp = shotSpeed
+      shotDrone.disable = false
+      table.insert(shots, shotDrone)
+    end
+end
 
 function game.shoot()
   if (#shots + #shotObjects) >= maxShotNumber then return end
@@ -87,17 +101,7 @@ function game.shoot()
      table.insert(shots, shot3)
     end
     
-    if shotType == 5 then
-      local dx = drone:getX()+drone:getWidth()/2
-      local dy = drone:getY()
-      
-      local shotDrone = {}
-      shotDrone.x = dx
-      shotDrone.y = dy
-      shotDrone.sp = shotSpeed
-      shotDrone.disable = false
-      table.insert(shots, shotDrone)
-    end
+ 
     
   elseif (shotType == 8) then
       local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
@@ -280,7 +284,8 @@ local function findNearestEnemyX(objectX)
 end
 
 
-local timer = cron.every(10, game.chooseShotType)
+local timer = cron.every(0.6, game.droneShoot)
+--local timer = cron.every(10, game.chooseShotType)
 
 function game.update(dt, gameX, gameY)
   gameTime = gameTime + dt
@@ -298,7 +303,8 @@ function game.update(dt, gameX, gameY)
     if joystick:isGamepad() then
       local value = joystick:getGamepadAxis('leftx')
       if math.abs(value) > joystickDeadzone then
-        dir = math.ceil(value)
+        --dir = math.ceil(value)
+        dir = value
       end
     end
   end
