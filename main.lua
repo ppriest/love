@@ -103,6 +103,18 @@ function love.keyreleased(key)
   end
 end
 
+function love.gamepadpressed(joystick, button)
+  if (button == 'a') then
+    game.shoot()    
+  end
+end
+
+function love.gamepadreleased(joystick, button)
+  if (button == 'back') then
+      love.event.quit()
+  end
+end
+
 function love.update(dt)
   game.update(dt, gameX, gameY)
 end

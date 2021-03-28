@@ -47,6 +47,8 @@ local totalShotCount
 local totalEnemiesKilledThisLevel
 local enemyKillTrigger
 
+local joystickDeadzone = 0.20
+
 local easyMode = false
 local startLevel = 1
 
@@ -259,14 +261,27 @@ function game.update(dt, gameX, gameY)
   if flagStopped then
     return
   end
-
-  -- keyboard actions for our hero
+  
   local dir = 0
+  
+  -- sticks
+  local joysticks = love.joystick.getJoysticks()
+  for i,joystick in ipairs(joysticks) do
+    if joystick:isGamepad() then
+      local value = joystick:getGamepadAxis('leftx')
+      if math.abs(value) > joystickDeadzone then
+        dir = math.ceil(value)
+      end
+    end
+  end
+  
+  -- keyboard actions for our hero
   if love.keyboard.isDown("left") then
     dir = -1
   elseif love.keyboard.isDown("right") then
     dir = 1
   end
+  
   hero:update(dt, dir, gameX, gameY)
   if shotType == 5 then
     drone:update(dt, dir, gameX, gameY)
