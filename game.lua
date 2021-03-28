@@ -7,6 +7,7 @@ require 'slam'
 -- Network play
 -- Mess with shaders for final effects, and also https://love2d.org/forums/viewtopic.php?t=79617
 -- Joystick support
+-- Sword and boom power-ups
 
 
 local game = {}
@@ -136,7 +137,7 @@ function game.chooseShotType(mode)
   elseif shotType == 5 then -- drone
     shotSpeed = 100
     maxShotNumber = 16
-  elseif shotType == 6 then -- drone
+  elseif shotType == 6 then -- sniper
     shotSpeed = 1500
     maxShotNumber = 1
   elseif shotType == 7 then -- disable
@@ -144,7 +145,7 @@ function game.chooseShotType(mode)
     maxShotNumber = 3
   elseif shotType == 8 then -- glaive
     shotSpeed = 0
-    maxShotNumber = 3
+    maxShotNumber = 7
   else
     shotSpeed = 0
     maxShotNumber = 0

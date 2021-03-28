@@ -50,7 +50,7 @@ function resource_manager.load()
   image1Quads["urn_red"] = love.graphics.newQuad(1*tS,4*tS,1*tS,1*tS,image1:getDimensions())
   
   --shooter
-  image1Quads["hero"] = love.graphics.newQuad(5*tS,0*tS,1*tS,1*tS,image1:getDimensions())
+  image1Quads["hero"] = love.graphics.newQuad(5*tS,5*tS,1*tS,1*tS,image1:getDimensions())
   
   --drone
   image1Quads["drone1"] = love.graphics.newQuad (6*tS,0*tS,1*tS,1*tS,image1:getDimensions())
