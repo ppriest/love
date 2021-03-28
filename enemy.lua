@@ -13,9 +13,7 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
   self.quadName = quadName or nil
   self.healthDamage = healthDamage or -1
   self.quadName2 = quadName2 or nil
-  
-  print('speed: ' .. self.speed .. ' health: ' .. self.health)
-  
+    
   -- scale up the graphics
   -- hitbox is smaller than enemy, and centered
   self.scale = 3

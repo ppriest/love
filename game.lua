@@ -35,20 +35,20 @@ local shotSpeed
 local shotType
 
 -- game state
-local level
-local score
 local flagStopped
 local flagGameover
 local flagWin
 local groundHeight = 540
 local winTime
 local gameTime
+local score
+local level
 local totalShotCount
 local totalEnemiesKilledThisLevel
 local enemyKillTrigger
 
+-- config
 local joystickDeadzone = 0.20
-
 local easyMode = false
 local startLevel = 1
 
@@ -252,6 +252,34 @@ function game.spawnEnemies(gameX, gameY)
   resource_manager.playMusic(music)
 end
 
+-- for an object at X location objectX, find whether the nearest enemy (horizontally) is left/right
+local function findNearestEnemyX(objectX)
+  local enemyDist = 9999
+  local enemyDir = 0
+  local enemyX = objectX
+
+  -- find closest
+
+  for ii,enemy in ipairs(enemies) do
+    if ((math.abs(objectX - enemy:getX()) < enemyDist) or enemyDist == 9999) then
+      enemyDist = math.abs(objectX - enemy:getX())
+      enemyX = enemy:getX() + enemy:getWidth()/2
+    end
+  end
+
+  if(enemyDist < 10) then
+    -- stop oscillation
+    enemyDir = 0
+  elseif(objectX > enemyX) then
+    enemyDir = -1
+  elseif (objectX < enemyX) then
+    enemyDir = 1
+  end
+  
+  return enemyDir
+end
+
+
 local timer = cron.every(10, game.chooseShotType)
 
 function game.update(dt, gameX, gameY)
@@ -284,6 +312,7 @@ function game.update(dt, gameX, gameY)
   
   hero:update(dt, dir, gameX, gameY)
   if shotType == 5 then
+    local dir = findNearestEnemyX(drone:getX())
     drone:update(dt, dir, gameX, gameY)
   end
 
@@ -297,26 +326,8 @@ function game.update(dt, gameX, gameY)
     shot.y = shot.y - dt*shot.sp
 
     if(shotType == 4) then 
-      local enemyDist = 9999
-      local enemyDir = 0
-      local enemyX = shot.x
-
-      -- find closest
-
-      for ii,enemy in ipairs(enemies) do
-        if ((math.abs(shot.x - enemy.x) < enemyDist) or enemyDist == 9999) then
-          enemyDist = math.abs(shot.x - enemy.x)
-          enemyX = enemy:getX() + enemy:getWidth()/2
-        end
-      end
-      
-      if(shot.x > enemyX) then
-        enemyDir = -1
-      elseif (shot.x < enemyX) then
-        enemyDir = 1
-      end
-	  
 	    -- approach nearest in an arc
+      local enemyDir = findNearestEnemyX(shot.x)
       local factor = ((500 - shot.y)/1000)
       shot.x = shot.x + dt*shot.sp*enemyDir*factor
     end
@@ -363,7 +374,6 @@ function game.update(dt, gameX, gameY)
   for i,enemy in ipairs(remEnemy) do
     table.remove(enemies, enemy)
     totalEnemiesKilledThisLevel = totalEnemiesKilledThisLevel + 1
-    print('totalEnemiesKilledThisLevel: ' .. totalEnemiesKilledThisLevel)
   end
   for i,shot in ipairs(remShot) do
     table.remove(shots, shot)
