@@ -4,6 +4,7 @@ local resource_manager = require("resource_manager")
 local radiusX = 0.18
 local radiusY = 0.3
 local speed = 2.0
+local inertTime = 0.1 -- won't damage again for this long
 
 function ShotObject:new(x, y, dir)
   self.x = x or 0
@@ -23,6 +24,8 @@ function ShotObject:new(x, y, dir)
   self.height= self.height*self.scale
   
   self.time = 0
+  self.timeLastDamage = 0
+  self.inert = false
 end
 
 function ShotObject:getHeight()
@@ -41,11 +44,25 @@ function ShotObject:getY()
   return self.y
 end
 
+function ShotObject:getInert()
+  return self.inert
+end
+
+function ShotObject:hit()
+  self.inert = true
+  self.timeLastDamage = self.time
+end
+
 function ShotObject:update(dt, game_x, game_y)
   self.time = self.time + dt
+  if self.time > (self.timeLastDamage + inertTime) then
+    self.inert = false
+  end
   
+  local animFrame = (math.floor(self.time*10) % 2) + 1
+  self.image, self.quad = resource_manager.getQuad("glaive" .. animFrame)
+ 
   local loopComplete = false
-  
   if (self.time*speed < math.pi*2) then
     -- ellipse
     self.x = self.initX - self.dir*game_x*radiusX*math.sin(self.time*speed)
@@ -56,10 +73,7 @@ function ShotObject:update(dt, game_x, game_y)
     self.y = self.initY
     loopComplete = true
   end
-  
-  local animFrame = (math.floor(self.time*10) % 2) + 1
-  self.image, self.quad = resource_manager.getQuad("glaive" .. animFrame)
-  
+   
   -- don't allow removal until completed arc
   if loopComplete and (self.y < 0 or self.y >= game_y or self.x < 0 or self.x > game_x) then
     return true 

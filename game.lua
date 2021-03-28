@@ -364,14 +364,15 @@ function game.update(dt, gameX, gameY)
       table.insert(remShotObject, i)
     end
     
-        -- check for collision with enemies
+    -- check for collision with enemies
     for ii,enemy in ipairs(enemies) do
-      if utilities.checkBoxCollisionC(shot, enemy) then
-        if(enemy:hit(shot.disable)) then
+      if utilities.checkBoxCollisionC(shot, enemy) then    
+        if(not shot:getInert() and enemy:hit(shot.disable)) then
           -- mark that enemy for removal
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
         end
+        shot:hit() -- ensure that it won't do damage for another short period
       end
     end
 
