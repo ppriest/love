@@ -2,7 +2,7 @@ local Enemy = require("enemy")
 
 local EnemyBoss = Enemy:extend()
 
-local colourChange = 0.20
+--local colourChange = 0.20
 
 function EnemyBoss:new(x, y)
   EnemyBoss.super.new(self, x, y, 6, 50, 10, "death", "boss")
