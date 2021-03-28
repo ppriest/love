@@ -19,10 +19,10 @@ function EnemyBlack:hit(disable)
   
   if(self.health == 2) then
     self.quadName = "black_damage1"
-    self.speed = 35
+    self.speed = 30
   elseif(self.health == 1) then
     self.quadName = "black_damage2"
-    self.speed = 0
+    self.speed = 15
   end
  
   return (self.health <= 0)
