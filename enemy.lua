@@ -18,13 +18,8 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
   
   -- scale up the graphics
   -- hitbox is smaller than enemy, and centered
-  local image, quad = resource_manager.getQuad(self.quadName)
   self.scale = 3
-  x, y, self.width, self.height = quad:getViewport()
-  self.offsetX = -(self.scale*self.width*0.6)/2
-  self.offsetY = -(self.scale*self.height*0.6)/2
-  self.width = self.width*self.scale*0.4
-  self.height= self.height*self.scale*0.4
+  Enemy.recalcScale(self)
   
   self.r = 1
   self.g = 1
@@ -33,6 +28,16 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
 
   self.time = 0
 end
+
+function Enemy:recalcScale()
+  print(self.quadName)
+  local image, quad = resource_manager.getQuad(self.quadName)
+  local x, y, width, height = quad:getViewport()
+  self.offsetX = -(self.scale*width*0.6)/2
+  self.offsetY = -(self.scale*height*0.6)/2
+  self.width = width*self.scale*0.4
+  self.height= height*self.scale*0.4
+end  
 
 function Enemy:setColor(r, g, b, a)
   self.r = r
@@ -68,7 +73,6 @@ end
 function Enemy:update(dt)
   self.time = self.time + dt
   self.y = self.y + dt*self.speed
-  print('self.y: ' .. self.y .. 'speed: ' .. self.speed .. ' dt: ' .. dt)
 end
 
 function Enemy:hit(disable)
