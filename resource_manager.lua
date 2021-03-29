@@ -8,6 +8,7 @@ local image1Quads = {}
 local gradient
 local music = {}
 local sound = {}
+local shaders = {}
 
 local tS = 16
 
@@ -71,11 +72,25 @@ function resource_manager.load()
   
   sound["shot"] = love.audio.newSource("sounds/344310__musiclegends__laser-shoot.wav", "static")
   sound["death"] = love.audio.newSource("sounds/448226__inspectorj__explosion-8-bit-01.wav", "static")
+  
+  shaders["white"] = love.graphics.newShader[[
+vec4 effect(vec4 vcolor, Image tex, vec2 texcoord, vec2 pixcoord)
+{
+    vec4 outputcolor = Texel(tex, texcoord) * vcolor;
+    outputcolor.rgb += vec3(1);
+    return outputcolor;
+}
+]]
+
 end
 
 
 function resource_manager.getQuad(quadName)
   return image1, image1Quads[quadName]
+end
+
+function resource_manager.getShader(shaderName)
+  return shaders[shaderName]
 end
   
 

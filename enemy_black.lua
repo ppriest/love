@@ -9,8 +9,8 @@ function EnemyBlack:new(x, y)
 end
 
 function EnemyBlack:update(dt)
-  self.time = self.time + dt
-  self.y = self.y + dt*self.speed
+  EnemyBlack.super.update(self, dt)
+  
   self.a = (math.sin(self.time)*alphaMin + (1-alphaMin))
 end
 
