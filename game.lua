@@ -103,9 +103,6 @@ function game.shoot()
      shot3.disable = false
      table.insert(shots, shot3)
     end
-    
- 
-    
   elseif (shotType == 8) then
       local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
       local shotObject = ShotObject(hx, hy, dir)
@@ -215,7 +212,7 @@ function game.spawnEnemies(gameX, gameY)
       music = "dramatic"
         
       for i=0,6 do
-        local enemy = Enemy(i*90 + 100, 180, 10, 1, 3, "death", "blue")
+        local enemy = EnemyBlue(i*90 + 100, 180)
         table.insert(enemies, enemy)
       end
 
