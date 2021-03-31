@@ -2,6 +2,7 @@ local Enemy = Object:extend()
 local resource_manager = require("resource_manager")
 
 local showHitbox = false
+local flashTime = 0.1
 
 function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage, quadName2)
   self.x = x or 0
@@ -25,6 +26,8 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
   self.a = 1
 
   self.time = 0
+  self.timeLastDamaged = 0
+  self.flashing = false
 end
 
 function Enemy:recalcScale()
@@ -70,10 +73,17 @@ end
 
 function Enemy:update(dt)
   self.time = self.time + dt
+  if self.time > (self.timeLastDamaged + flashTime) then
+    self.flashing = false
+  end
+  
   self.y = self.y + dt*self.speed
 end
 
 function Enemy:hit(disable)
+  self.flashing = true
+  self.timeLastDamaged = self.time
+  
   if disable then
     self.speed = 0
   end
@@ -92,12 +102,22 @@ end
 
 function Enemy:draw()
   local image, quad = resource_manager.getQuad(self.quadName)
+  local shader = resource_manager.getShader("white")
+  
+  if self.flashing then
+    love.graphics.setShader(shader)
+  else
+    love.graphics.setShader()
+  end
+  
   love.graphics.setColor(self.r,self.g,self.b,self.a)
   love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
   
   if showHitbox then
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height) 
   end
+  
+  love.graphics.setShader()
 end
 
 return Enemy
