@@ -6,7 +6,6 @@ require 'slam'
 -- Item boxes
 -- Network play
 -- Mess with shaders for final effects, and also https://love2d.org/forums/viewtopic.php?t=79617
--- Joystick support
 -- Sword and boom power-ups
 
 
@@ -16,8 +15,10 @@ local cron = require "cron"
 
 local utilities = require("utilities")
 local resource_manager = require("resource_manager")
+
 local Hero = require("hero")
 local Enemy = require("enemy")
+local EnemyBlue= require("enemy_blue")
 local EnemyRed = require("enemy_red")
 local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
@@ -195,7 +196,7 @@ function game.spawnEnemies(gameX, gameY)
   if easyMode then
     if level == 1 then
       music = "dramatic"
-      local enemy = Enemy(90 + 100, 180, 10, 1, 3, "death", "blue")
+      local enemy = EnemyBlue(90 + 100, 180)
       table.insert(enemies, enemy)
     elseif level == 2 then
       music = "bossfight"

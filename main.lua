@@ -64,7 +64,7 @@ function love.load(arg)
     mobile = true
   end
   
-  love.window.setTitle("Matthew's Shooter")
+  --love.window.setTitle("Matthew's Shooter")
   winWidth = love.graphics.getWidth()
   winHeight = love.graphics.getHeight()
   print("love.load()")
