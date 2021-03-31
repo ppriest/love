@@ -1,5 +1,5 @@
 Object = require "classic"
-require "sstrict/sstrict"
+--require "sstrict/sstrict"
 local globals = require("globals")
 
 local game = require("game")
@@ -70,7 +70,7 @@ function love.load(arg)
   print("love.load()")
   print("  winWidth: " .. winWidth)
   print("  winHeight: " .. winHeight)
-  initDisplay(true)
+  initDisplay(fullscreen)
   
   love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -92,6 +92,8 @@ function love.keypressed(k)
     initDisplay(not fullscreen)
   elseif k == 'r' then -- reset
     game.reload(gameX, gameY)
+  elseif k == 'p' then -- pause
+    game.togglePause()
   elseif k == 'g' then -- dump globals
     globals.dump(_G,"")
   end

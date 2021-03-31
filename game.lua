@@ -39,6 +39,7 @@ local shotType
 local flagStopped
 local flagGameover
 local flagWin
+local flagPaused
 local groundHeight = 540
 local winTime
 local gameTime
@@ -289,6 +290,10 @@ local timer = cron.every(0.6, game.droneShoot)
 --local timer = cron.every(10, game.chooseShotType)
 
 function game.update(dt, gameX, gameY)
+  if flagPaused then
+    return
+  end
+  
   gameTime = gameTime + dt
   timer:update(dt)
   
@@ -467,6 +472,11 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.printf( "Score: " .. score, gameX-400-border, 10, 400/1.8, "right", 0.1, 1.8, 1.6) 
   end
   
+  if flagPaused then
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.printf( 'Paused!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+    love.graphics.printf( 'Score: '.. score .. '\n\nPress \'P\' to Resume', (gameX - 2*250)/2, gameY/3 + 90, 250, "center", 0, 2, 2)
+  end
   if flagGameover then
     love.graphics.setColor(1,1,1,1)
     love.graphics.printf( 'Game Over!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
@@ -478,6 +488,13 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*250)/2, gameY/3 + 90, 250, "center", 0, 2, 2)
   end
 
+end
+
+function game.togglePause()
+  if not flagGameover and not flagWin then
+    flagStopped = not flagPaused
+    flagPaused = not flagPaused
+  end
 end
 
 return game
