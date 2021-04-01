@@ -37,8 +37,10 @@ end
 
 
 function Powerup:update(dt, groundHeight)
-  if self.y <= groundHeight - 15 then
+  if self.y < groundHeight - 15 then
     self.y = self.y + self.speed*dt
+  else
+    self.y = groundHeight - 15
   end
 end
 

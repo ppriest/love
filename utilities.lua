@@ -3,9 +3,11 @@ local utilities = {}
 -- Collision detection function.
 -- Checks if a an d b overlap.
 -- w and h mean width and height.
-function utilities.checkBoxCollision(ax1,ay1,aw,ah, bx1,by1,bw,bh)
-  local ax2,ay2,bx2,by2 = ax1 + aw, ay1 + ah, bx1 + bw, by1 + bh
-  return ax1 < bx2 and ax2 > bx1 and ay1 < by2 and ay2 > by1
+function utilities.checkBoxCollision(ax1,ay1,aw,ah,bx1,by1,bw,bh)
+  return ax1 < (bx1 + bw) and 
+         (ax1 + aw) > bx1 and 
+         ay1 < (by1 + bh) and 
+         (ay1 + ah) > by1
 end
 
 function utilities.checkBoxCollisionC(a,b)

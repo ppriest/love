@@ -331,8 +331,13 @@ function game.update(dt, gameX, gameY)
   end
 
   local remPowerup = {}
+  local remEnemy = {}
+  local remShot = {}
+  local remShotObject = {}
   
+  -- powerups
   for ii,powerup in ipairs(powerups) do
+    print('iter ii: ' .. ii .. ' gameTime: ' .. gameTime .. ' hero: ' .. hero:getX() .. ' powerup: ' .. powerup:getX() )
     powerup:update(dt, groundHeight)
     if utilities.checkBoxCollisionC(hero, powerup) then
       print('marking ii: ' .. ii .. ' gameTime: ' .. gameTime .. ' hero: ' .. hero:getX() .. ' powerup: ' .. powerup:getX() )
@@ -340,10 +345,6 @@ function game.update(dt, gameX, gameY)
       game.chooseShotType(powerup:getType())
     end
   end
-
-  local remEnemy = {}
-  local remShot = {}
-  local remShotObject = {}
 
   -- update the shots
   for i,shot in ipairs(shots) do
