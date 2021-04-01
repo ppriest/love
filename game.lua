@@ -2,13 +2,11 @@ require ('slam')
 local flux = require ("flux/flux")
 
 -- TODO
--- Boss mode, play boss music when there is a boss onscreen
--- Enemy spawner
 -- Network play
--- Mess with shaders for final effects, and also https://love2d.org/forums/viewtopic.php?t=79617
 -- Sword and boom power-ups
 -- Certain enemies have certain drops
-
+-- Enemies fight back
+--save progress (high score, killed rare enemy ecs.)
 
 local game = {}
 
@@ -29,12 +27,12 @@ local ShotObject = require("shot_object")
 local Powerup = require("powerup")
 
 -- game objects
-local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper", "Disable", "Glaive" }
+local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Boom", "Disable", "Shuriken" }
 local hero
 local drone
 local shots
 local shotObjects
-local enemies 
+local enemies
 local enemiesNextWave
 local powerups
 local maxShotNumber
@@ -49,6 +47,7 @@ local flagPaused
 local groundHeight = 540
 local winTime
 local gameTime
+local powerupTime
 local score
 local level
 local music
@@ -60,8 +59,9 @@ local enemyKillTrigger
 local joystickDeadzone = 0.20
 local easyMode = false
 local startLevel = 1
-local powerupChance = 0.5
+local powerupChance = 0.15
 local droneShootPeriod = 0.6 -- seconds
+local powerupDuration = 10
 
 function game.droneShoot()
   if (#shots + #shotObjects) >= maxShotNumber then return end
@@ -127,6 +127,8 @@ function game.chooseShotType(mode)
     return
   end
   
+  lastPowerupTime = gameTime
+  
   mode = mode or love.math.random(1,8)
   shotType = mode
 
@@ -173,7 +175,13 @@ function game.load(gameX, gameY)
   game.reload(gameX, gameY)
 end
 
-function game.reload(gameX, gameY)
+function game.incLevel(gameX, gameY, incLevel)
+  local newLevel = level + incLevel
+  game.reload(gameX, gameY, newLevel)
+end
+
+function game.reload(gameX, gameY, newLevel)
+  level = newLevel or startLevel
   flagStopped = false
   flagGameover = false
   flagWin = false
@@ -181,6 +189,7 @@ function game.reload(gameX, gameY)
   score = 0
   winTime = -1
   gameTime = 0
+  lastPowerupTime = 0
   totalShotCount = 0
 
   shots = {} -- holds our fired shots
@@ -188,7 +197,6 @@ function game.reload(gameX, gameY)
   hero = Hero(400, groundHeight-15, 150, "hero") 
   drone = Hero(400, groundHeight-15, 450, "drone1") 
   
-  level = startLevel
   enemies = {}
   enemiesNextWave = {}
   powerups = {}
@@ -238,8 +246,33 @@ function game.spawnEnemies(gameX, gameY)
       for i=0,1 do
         table.insert(enemies, EnemyBlack(i*250 + 250, 25))
       end
-            
+      
     elseif level == 4 then
+      music = "dramatic"
+      enemyKillTrigger = 15
+      for i=0,11 do
+        table.insert(enemies, EnemyBlue(i*((gameX - 100.0)/12) + 50, 25))
+      end
+      for i=0,9 do
+        table.insert(enemies, EnemyBlue(i*((gameX - 100.0)/10) + 50, 50))
+      end
+      for i=0,2 do
+        table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
+      end
+      
+    elseif level == 5 then
+      music = "bossfight"
+      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
+      for i=0,6 do
+        table.insert(enemies, EnemyBlue(i*90 + 100, 100))
+      end
+    elseif level == 6 then
+      music = "dramatic"
+      for i=0,2 do
+        table.insert(enemies, EnemyUrn(i*90 + 100, 180))
+      end
+      
+    elseif level == 15 then
       music = "bossfight"
       enemyKillTrigger = 3
       table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
@@ -444,7 +477,7 @@ function game.update(dt, gameX, gameY)
   end
   
   -- spawn more enemies
-  if (totalEnemiesKilledThisLevel == enemyKillTrigger) then
+  if (totalEnemiesKilledThisLevel >= enemyKillTrigger) then
     for i,enemy in ipairs(enemiesNextWave) do
       table.insert(enemies, enemy)
       enemiesNextWave[i] = nil
@@ -489,8 +522,18 @@ end
           
 function game.draw(gameX, gameY)  -- let's draw a background
 
-  love.graphics.setColor(0.0,0,0.08,1.0)
+  local hour = tonumber(os.date("%H"))
+   if hour <=10 and hour >= 7 then
+        love.graphics.setColor(0.18,0,0.03,1)
+  elseif hour <=6 or hour >= 21 then
+        love.graphics.setColor(0,0,0,1)
+  elseif hour <=20 and hour >= 18 then
+        love.graphics.setColor(0.1,0,0.1,1)
+  elseif hour <=17 and hour >= 11 then
+        love.graphics.setColor(0.1,0.05,0.05,1)
+  end
   love.graphics.rectangle("fill", 0, 0, gameX, gameY)
+  
   if(flagWin) then
     local alpha = (gameTime-winTime)/5
     love.graphics.setColor(1,1,1,alpha) 
@@ -530,8 +573,10 @@ function game.draw(gameX, gameY)  -- let's draw a background
   
   -- draw overlay
   if(not flagStopped) then
+     
     love.graphics.setColor(1,1,1,1)
     local border = 10
+    love.graphics.printf( "Level: " .. level, gameX-250-border, 10, 400/1.8, "right") 
     love.graphics.printf( "Shot: " .. game.shotString(shotType), border, 50, 400/1.8, "left", -0.1, 1.8, 1.6) 
     love.graphics.printf( "Score: " .. score, gameX-400-border, 10, 400/1.8, "right", 0.1, 1.8, 1.6) 
   end

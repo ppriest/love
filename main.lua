@@ -94,6 +94,10 @@ function love.keypressed(k)
     initDisplay(not fullscreen)
   elseif k == 'r' then -- reset
     game.reload(gameX, gameY)
+  elseif k == '=' then -- + level
+    game.incLevel(gameX, gameY, 1)
+  elseif k == '-' then -- - level
+    game.incLevel(gameX, gameY, -1)
   elseif k == 'p' then -- pause
     game.togglePause()
   elseif k == 'g' then -- dump globals
