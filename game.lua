@@ -3,10 +3,10 @@ require 'slam'
 -- TODO
 -- Boss mode, play boss music when there is a boss onscreen
 -- Enemy spawner
--- Item boxes
 -- Network play
 -- Mess with shaders for final effects, and also https://love2d.org/forums/viewtopic.php?t=79617
 -- Sword and boom power-ups
+-- Certain enemies have certain drops
 
 
 local game = {}
@@ -442,6 +442,15 @@ function game.update(dt, gameX, gameY)
     for i,enemy in ipairs(enemiesNextWave) do
       table.insert(enemies, enemy)
       enemiesNextWave[i] = nil
+    end
+  end
+  
+  -- secret spawn
+  local rare = math.random(1,100/dt)
+  if rare == 1 then
+    for i=0,6 do
+        local enemy = EnemyBlue(i*90 + 100, 180)
+        table.insert(enemies, enemy)
     end
   end
   
