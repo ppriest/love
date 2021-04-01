@@ -10,11 +10,10 @@ function Powerup:new(x, y, speed, powerup)
   self.powerup = powerup or 1
   self.image, self.quad = resource_manager.getQuad('powerup' .. self.powerup)
 
-  print(self.powerup)
-
   -- scale up the graphics
   -- hitbox is smaller than enemy, and centered
   self.scale = 2
+  self.time = 0
 end
 
 function Powerup:getHeight()
@@ -37,13 +36,19 @@ function Powerup:getType()
   return self.powerup
 end
 
-
+-- returns true if should be removed
 function Powerup:update(dt, groundHeight)
+  self.time = self.time + dt
+  local grounded = false
+  
   if self.y < groundHeight then
     self.y = self.y + self.speed*dt
   else
     self.y = groundHeight
+    grounded = true
   end
+  
+  return grounded and self.time > 5
 end
 
 function Powerup:draw()

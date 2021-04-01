@@ -31,7 +31,6 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage
 end
 
 function Enemy:recalcScale()
-  print(self.quadName)
   local image, quad = resource_manager.getQuad(self.quadName)
   local x, y, width, height = quad:getViewport()
   self.offsetX = -(self.scale*width*0.6)/2

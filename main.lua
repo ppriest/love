@@ -1,5 +1,5 @@
 Object = require "classic"
---require "sstrict/sstrict"
+require "sstrict/sstrict"
 local globals = require("globals")
 
 local game = require("game")

@@ -57,6 +57,7 @@ local enemyKillTrigger
 local joystickDeadzone = 0.20
 local easyMode = false
 local startLevel = 1
+local powerupChance = 0.5
 
 function game.droneShoot()
   if (#shots + #shotObjects) >= maxShotNumber then return end
@@ -337,7 +338,10 @@ function game.update(dt, gameX, gameY)
   
   -- powerups
   for ii,powerup in ipairs(powerups) do
-    powerup:update(dt, groundHeight)
+    if powerup:update(dt, groundHeight) then
+      table.insert(remPowerup, ii)
+    end
+    
     if utilities.checkBoxCollisionC(hero, powerup) then
       table.insert(remPowerup, ii)
       game.chooseShotType(powerup:getType())
@@ -369,7 +373,8 @@ function game.update(dt, gameX, gameY)
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
           
-          local powerupType = math.random(1,16)
+          local max = #shotStrings * math.ceil(1.0/powerupChance)
+          local powerupType = math.random(1,max)
           if powerupType <= #shotStrings then
             local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
             table.insert(powerups, powerup)
@@ -395,28 +400,30 @@ function game.update(dt, gameX, gameY)
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
           
-          local powerupType = math.random(1,8)
-          local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
-          table.insert(powerups, powerup)
+          local max = #shotStrings * math.ceil(1.0/powerupChance)
+          local powerupType = math.random(1,max)
+          if powerupType <= #shotStrings then
+            local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
+            table.insert(powerups, powerup)
+          end
         end
         shot:hit() -- ensure that it won't do damage for another short period
       end
     end
-
   end
 
   -- remove the marked enemies and shots
-  for i,enemy in ipairs(remEnemy) do
+  for i,enemy in utilities.ripairs(remEnemy) do
     table.remove(enemies, enemy)
     totalEnemiesKilledThisLevel = totalEnemiesKilledThisLevel + 1
   end
-  for i,shot in ipairs(remShot) do
+  for i,shot in utilities.ripairs(remShot) do
     table.remove(shots, shot)
   end    
-  for i,shot in ipairs(remShotObject) do
+  for i,shot in utilities.ripairs(remShotObject) do
     table.remove(shotObjects, shot)
   end    
-  for i,shot in ipairs(remPowerup) do
+  for i,powerup in utilities.ripairs(remPowerup) do
     table.remove(powerups, powerup)
   end    
   
