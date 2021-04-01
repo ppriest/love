@@ -27,6 +27,7 @@ local ShotObject = require("shot_object")
 local Powerup = require("powerup")
 
 -- game objects
+local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper", "Disable", "Glaive" }
 local hero
 local drone
 local shots
@@ -154,7 +155,6 @@ function game.chooseShotType(mode)
 end
 
 function game.shotString(localShotType)
-  local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Sniper", "Disable", "Glaive" }
   if localShotType >= 1 and localShotType <= #shotStrings then
     return shotStrings[localShotType]
   end
@@ -337,10 +337,8 @@ function game.update(dt, gameX, gameY)
   
   -- powerups
   for ii,powerup in ipairs(powerups) do
-    print('iter ii: ' .. ii .. ' gameTime: ' .. gameTime .. ' hero: ' .. hero:getX() .. ' powerup: ' .. powerup:getX() )
     powerup:update(dt, groundHeight)
     if utilities.checkBoxCollisionC(hero, powerup) then
-      print('marking ii: ' .. ii .. ' gameTime: ' .. gameTime .. ' hero: ' .. hero:getX() .. ' powerup: ' .. powerup:getX() )
       table.insert(remPowerup, ii)
       game.chooseShotType(powerup:getType())
     end
@@ -371,9 +369,11 @@ function game.update(dt, gameX, gameY)
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
           
-          local powerupType = math.random(1,8)
-          local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
-          table.insert(powerups, powerup)
+          local powerupType = math.random(1,16)
+          if powerupType <= #shotStrings then
+            local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
+            table.insert(powerups, powerup)
+          end
         end
         -- mark the shot to be removed
         table.insert(remShot, i)
@@ -417,7 +417,6 @@ function game.update(dt, gameX, gameY)
     table.remove(shotObjects, shot)
   end    
   for i,shot in ipairs(remPowerup) do
-    print('removing ii: ' .. i .. ' gameTime: ' .. gameTime)
     table.remove(powerups, powerup)
   end    
   

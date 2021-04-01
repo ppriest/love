@@ -59,7 +59,7 @@ function resource_manager.load()
   
   for ii=1,8,1
   do
-    image1Quads["powerup" .. ii] = {quad=love.graphics.newQuad (ii*tS10,0*tS10,1*tS10,1*tS10,image2:getDimensions()), image=image2}   
+    image1Quads["powerup" .. ii] = {quad=love.graphics.newQuad ((ii-1)*tS10,0*tS10,1*tS10,1*tS10,image2:getDimensions()), image=image2}   
   end
    
   music["dramatic"] = love.audio.newSource("sounds/538828__puredesigngirl__dramatic-music.mp3", "stream")
