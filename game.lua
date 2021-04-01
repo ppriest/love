@@ -50,6 +50,7 @@ local winTime
 local gameTime
 local score
 local level
+local music
 local totalShotCount
 local totalEnemiesKilledThisLevel
 local enemyKillTrigger
@@ -143,12 +144,12 @@ function game.chooseShotType(mode)
   elseif shotType == 5 then -- drone
     shotSpeed = 100
     maxShotNumber = 16
-  elseif shotType == 6 then -- sniper
-    shotSpeed = 1500
-    maxShotNumber = 1
+  elseif shotType == 6 then -- boom
+    shotSpeed = 100
+    maxShotNumber = 5
   elseif shotType == 7 then -- disable
     shotSpeed = 120
-    maxShotNumber = 3
+    maxShotNumber = 5
   elseif shotType == 8 then -- glaive
     shotSpeed = 0
     maxShotNumber = 7
@@ -198,7 +199,6 @@ function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
   totalEnemiesKilledThisLevel = 0
   enemyKillTrigger = 0
-  local music
   if easyMode then
     if level == 1 then
       music = "dramatic"
@@ -224,23 +224,37 @@ function game.spawnEnemies(gameX, gameY)
         local enemy = EnemyBlue(i*90 + 100, 180)
         table.insert(enemies, enemy)
       end
-
+            
+    elseif level == 2 then
+      music = "dramatic"
+      
       for i=0,10 do
         local enemy = EnemyRed(i*70 + 30, 120)
         table.insert(enemies, enemy)
       end
       
-      for i=0,2 do
-       local enemy2 = EnemyPurple(i*250 + 100, 250)
-       table.insert(enemies, enemy2)
+      for i=0,12 do
+        local enemy = EnemyBlue(i*45 + 100, 180)
+        table.insert(enemies, enemy)
       end
       
+    elseif level == 3 then
+      music = "dramatic"
+      
       for i=0,1 do
-       local enemy2 = EnemyUrn(i*400 + 100, 2)
-       table.insert(enemies, enemy2)
+        local enemy = EnemyBlack(i*250 + 250, 25)
+        table.insert(enemies, enemy)
       end
-            
-    elseif level == 2 then
+      
+      elseif level == 4 then
+      music = "dramatic"
+      
+      for i=0,1 do
+        local enemy = Enemy(i*225 + 225, 25)
+        table.insert(enemies, enemy)
+      end
+      
+    elseif level == 4 then
       music = "bossfight"
       
       local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
