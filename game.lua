@@ -24,6 +24,7 @@ local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
 local ShotObject = require("shot_object")
+local Powerup = require("powerup")
 
 -- game objects
 local hero
@@ -32,6 +33,7 @@ local shots
 local shotObjects
 local enemies
 local enemiesNextWave
+local powerups
 local maxShotNumber
 local shotSpeed
 local shotType
@@ -169,6 +171,7 @@ function game.reload(gameX, gameY)
   flagStopped = false
   flagGameover = false
   flagWin = false
+  flagPaused = false
   score = 0
   winTime = -1
   gameTime = 0
@@ -182,6 +185,7 @@ function game.reload(gameX, gameY)
   level = startLevel
   enemies = {}
   enemiesNextWave = {}
+  powerups = {}
   game.spawnEnemies(gameX, gameY)
   shotObjects = {}
 end
@@ -326,6 +330,17 @@ function game.update(dt, gameX, gameY)
     drone:update(dt, dir, gameX, gameY)
   end
 
+  local remPowerup = {}
+  
+  for ii,powerup in ipairs(powerups) do
+    powerup:update(dt, groundHeight)
+    if utilities.checkBoxCollisionC(hero, powerup) then
+      print('marking ii: ' .. ii .. ' gameTime: ' .. gameTime .. ' hero: ' .. hero:getX() .. ' powerup: ' .. powerup:getX() )
+      table.insert(remPowerup, ii)
+      game.chooseShotType(powerup:getType())
+    end
+  end
+
   local remEnemy = {}
   local remShot = {}
   local remShotObject = {}
@@ -354,6 +369,10 @@ function game.update(dt, gameX, gameY)
           -- mark that enemy for removal
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
+          
+          local powerupType = math.random(1,8)
+          local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
+          table.insert(powerups, powerup)
         end
         -- mark the shot to be removed
         table.insert(remShot, i)
@@ -374,6 +393,10 @@ function game.update(dt, gameX, gameY)
           -- mark that enemy for removal
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
+          
+          local powerupType = math.random(1,8)
+          local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
+          table.insert(powerups, powerup)
         end
         shot:hit() -- ensure that it won't do damage for another short period
       end
@@ -391,6 +414,10 @@ function game.update(dt, gameX, gameY)
   end    
   for i,shot in ipairs(remShotObject) do
     table.remove(shotObjects, shot)
+  end    
+  for i,shot in ipairs(remPowerup) do
+    print('removing ii: ' .. i .. ' gameTime: ' .. gameTime)
+    table.remove(powerups, powerup)
   end    
   
   -- update the enemies' positions
@@ -436,20 +463,25 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.draw(resource_manager.getGradient(), 0, 0, 0, gameX, gameY)
   end
 
-  -- let's draw our enemies
+  -- draw enemies
   for i,enemy in ipairs(enemies) do
     enemy:draw()
   end
   
-  -- let's draw some ground _over_ the enemies
+  -- draw some ground _over_ the enemies
   love.graphics.setColor(0,0.6,0,1.0)
   love.graphics.rectangle("fill", 0, groundHeight, gameX, gameY-groundHeight)
   
-  -- let's draw our hero
+  -- draw hero
   if shotType == 5 then
     drone:draw()
   end
   hero:draw()
+   
+  -- draw powerups
+  for i,powerup in ipairs(powerups) do
+    powerup:draw()
+  end
    
    -- shots on top of actors
   love.graphics.setColor(0.5,0.5,0.5,1)
