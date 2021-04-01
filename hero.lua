@@ -49,6 +49,7 @@ function Hero:getY()
   return self.y
 end
 
+-- dir is speed multiplier and direction - normally 1.0 / -1.0
 function Hero:update(dt, dir, game_x, game_y)
   self.x = self.x + self.speed*dt*dir
   if self.x < 0 then

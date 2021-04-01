@@ -58,6 +58,7 @@ local joystickDeadzone = 0.20
 local easyMode = false
 local startLevel = 1
 local powerupChance = 0.5
+local droneShootPeriod = 0.6 -- seconds
 
 function game.droneShoot()
   if (#shots + #shotObjects) >= maxShotNumber then return end
@@ -73,6 +74,7 @@ function game.droneShoot()
       table.insert(shots, shotDrone)
     end
 end
+local timer = cron.every(droneShootPeriod, game.droneShoot)
 
 function game.shoot()
   if (#shots + #shotObjects) >= maxShotNumber then return end
@@ -270,13 +272,14 @@ local function findNearestEnemyX(objectX)
   -- find closest
 
   for ii,enemy in ipairs(enemies) do
-    if ((math.abs(objectX - enemy:getX()) < enemyDist) or enemyDist == 9999) then
-      enemyDist = math.abs(objectX - enemy:getX())
-      enemyX = enemy:getX() + enemy:getWidth()/2
+    local thisEnemyX = enemy:getX() + enemy:getWidth()/2
+    if ((math.abs(objectX - thisEnemyX) < enemyDist) or enemyDist == 9999) then
+      enemyDist = math.abs(objectX - thisEnemyX)
+      enemyX = thisEnemyX
     end
   end
 
-  if(enemyDist < 10) then
+  if(enemyDist < 3) then
     -- stop oscillation
     enemyDir = 0
   elseif(objectX > enemyX) then
@@ -287,10 +290,6 @@ local function findNearestEnemyX(objectX)
   
   return enemyDir
 end
-
-
-local timer = cron.every(0.6, game.droneShoot)
---local timer = cron.every(10, game.chooseShotType)
 
 function game.update(dt, gameX, gameY)
   if flagPaused then
@@ -327,7 +326,7 @@ function game.update(dt, gameX, gameY)
   
   hero:update(dt, dir, gameX, gameY)
   if shotType == 5 then
-    local dir = findNearestEnemyX(drone:getX())
+    local dir = findNearestEnemyX(drone:getX() + drone:getWidth()/2)
     drone:update(dt, dir, gameX, gameY)
   end
 
@@ -412,7 +411,8 @@ function game.update(dt, gameX, gameY)
     end
   end
 
-  -- remove the marked enemies and shots
+  -- remove the marked enemies and shots. work backwards to avoid removing the wrong ones on multiple removal
+  -- there are more efficient algos for this that aren't O(n^2) from repeated calls to table.remove()
   for i,enemy in utilities.ripairs(remEnemy) do
     table.remove(enemies, enemy)
     totalEnemiesKilledThisLevel = totalEnemiesKilledThisLevel + 1
