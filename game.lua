@@ -58,7 +58,7 @@ local enemyKillTrigger
 -- config
 local joystickDeadzone = 0.20
 local easyMode = false
-local startLevel = 1
+local startLevel = 4
 local powerupChance = 0.5
 local droneShootPeriod = 0.6 -- seconds
 
@@ -245,15 +245,7 @@ function game.spawnEnemies(gameX, gameY)
         local enemy = EnemyBlack(i*250 + 250, 25)
         table.insert(enemies, enemy)
       end
-      
-      elseif level == 4 then
-      music = "dramatic"
-      
-      for i=0,1 do
-        local enemy = Enemy(i*225 + 225, 25)
-        table.insert(enemies, enemy)
-      end
-      
+            
     elseif level == 4 then
       music = "bossfight"
       
