@@ -583,6 +583,9 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.printf( "Level: " .. level, gameX-250-border, 10, 400/1.8, "right") 
     love.graphics.printf( "Shot: " .. game.shotString(shotType), border, 50, 400/1.8, "left", -0.1, 1.8, 1.6) 
     love.graphics.printf( "Score: " .. score, gameX-400-border, 10, 400/1.8, "right", 0.1, 1.8, 1.6) 
+       
+    game.drawGauge(gameX, gameY)
+    
   end
   
   if flagPaused then
@@ -601,6 +604,28 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.printf( 'Score: '.. score .. '\n\nPress \'R\' to Try Again', (gameX - 2*250)/2, gameY/3 + 90, 250, "center", 0, 2, 2)
   end
 
+end
+
+function game.drawGauge(gameX, gameY)
+  local fillLevel = ((#shots + #shotObjects) / maxShotNumber)
+  if(fillLevel > 1.0) then
+    fillLevel = 1.0
+  end
+    
+  if(fillLevel > 0.7) then
+    love.graphics.setColor(0.6,0,0,1)
+  else
+    love.graphics.setColor(0,1,0,1)
+  end
+  love.graphics.rectangle("fill", 10, (gameY-70) - (50 * fillLevel), 25, 50 * fillLevel) 
+  if(fillLevel > 0.95) then
+    love.graphics.setColor(1.0,0,0,0.15)
+    love.graphics.printf( 'Overheat!', (gameX - 3*200)/2, gameY/3, 200, "center", 0, 3, 3)
+    love.graphics.setColor(1.0,0,0,1)
+  else
+    love.graphics.setColor(0.7,0.7,0.7,1)
+  end
+  love.graphics.rectangle("line", 10, gameY-120, 25, 50)
 end
 
 function game.togglePause()
