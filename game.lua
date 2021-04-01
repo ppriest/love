@@ -23,6 +23,7 @@ local EnemyRed = require("enemy_red")
 local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
+local EnemyUrn = require("enemy_urn")
 local ShotObject = require("shot_object")
 local Powerup = require("powerup")
 
@@ -32,7 +33,7 @@ local hero
 local drone
 local shots
 local shotObjects
-local enemies
+local enemies 
 local enemiesNextWave
 local powerups
 local maxShotNumber
@@ -232,6 +233,11 @@ function game.spawnEnemies(gameX, gameY)
        local enemy2 = EnemyPurple(i*250 + 100, 250)
        table.insert(enemies, enemy2)
       end
+      
+      for i=0,1 do
+       local enemy2 = EnemyUrn(i*400 + 100, 2)
+       table.insert(enemies, enemy2)
+      end
             
     elseif level == 2 then
       music = "bossfight"
@@ -378,6 +384,13 @@ function game.update(dt, gameX, gameY)
             local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
             table.insert(powerups, powerup)
           end
+          
+          if enemy:is(EnemyUrn) then
+            print ('1 enemies: ' .. #enemies)
+            local enemy2 = EnemyBlue(enemy:getX(), enemy:getY()-20)
+            table.insert(enemies, enemy2)
+            print ('2 enemies: ' .. #enemies)
+          end
         end
         -- mark the shot to be removed
         table.insert(remShot, i)
@@ -405,6 +418,12 @@ function game.update(dt, gameX, gameY)
             local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
             table.insert(powerups, powerup)
           end
+          
+          if enemy:is(EnemyUrn) then
+            local enemy2 = EnemyBlue(enemy:getX(), enemy:getY())
+            table.insert(enemies, enemy2)
+          end
+
         end
         shot:hit() -- ensure that it won't do damage for another short period
       end

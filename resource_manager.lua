@@ -37,8 +37,8 @@ function resource_manager.load()
   image1Quads["boss"] =           {quad=love.graphics.newQuad(3*tS,0*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
   image1Quads["boss_damage"] =    {quad=love.graphics.newQuad(3*tS,2*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
   image1Quads["boss_damage2"] =   {quad=love.graphics.newQuad(3*tS,4*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
-  image1Quads["urn"] =            {quad=love.graphics.newQuad(0*tS,4*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["urn_red"] =        {quad=love.graphics.newQuad(1*tS,4*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  image1Quads["urn"] =            {quad=love.graphics.newQuad(0*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  image1Quads["urn_red"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   
   --hero
   image1Quads["hero"] = {quad=love.graphics.newQuad(5*tS,5*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
@@ -70,6 +70,7 @@ function resource_manager.load()
   
   sound["shot"] = love.audio.newSource("sounds/344310__musiclegends__laser-shoot.wav", "static")
   sound["death"] = love.audio.newSource("sounds/448226__inspectorj__explosion-8-bit-01.wav", "static")
+  sound["smash"] = love.audio.newSource("sounds/524999__geraldfiebig__ceramic-cup-shatters-on-tile-floor.wav", "static")
   
   shaders["white"] = love.graphics.newShader[[
 vec4 effect(vec4 vcolor, Image tex, vec2 texcoord, vec2 pixcoord)
