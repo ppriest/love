@@ -1,6 +1,7 @@
-Object = require "classic"
-require "sstrict/sstrict"
+Object = require ("classic")
+local flux = require ("flux/flux")
 local globals = require("globals")
+--require ("sstrict/sstrict")
 
 local game = require("game")
 
@@ -52,6 +53,7 @@ function love.resize(w, h)
   love.graphics.scale(scale, scale)
   offsetX = math.floor(w - (gameX*scale))/2
   offsetY = math.floor(h - (gameY*scale))/2
+
   print("  offsetX: " .. offsetX)
   print("  offsetY: " .. offsetY)
 end
@@ -118,6 +120,7 @@ function love.gamepadreleased(joystick, button)
 end
 
 function love.update(dt)
+  flux.update(dt)
   game.update(dt, gameX, gameY)
 end
 

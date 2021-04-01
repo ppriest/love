@@ -1,4 +1,4 @@
-require 'slam'
+require ('slam')
 
 -- TODO
 -- Boss mode, play boss music when there is a boss onscreen
@@ -198,6 +198,7 @@ function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
   totalEnemiesKilledThisLevel = 0
   enemyKillTrigger = 0
+  local music
   if easyMode then
     if level == 1 then
       music = "dramatic"
@@ -246,13 +247,13 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemies, enemy) 
     
       for i=0,2 do
-        local enemy = EnemyBlack(i*110 + 100, 40)
-        table.insert(enemies, enemy)
+        local enemy2 = EnemyBlack(i*110 + 100, 40)
+        table.insert(enemies, enemy2)
       end
       
       for i=0,2 do
-        local enemy = EnemyBlack(gameX - (i*110 + 100), 40)
-        table.insert(enemiesNextWave, enemy)
+        local enemy2 = EnemyBlack(gameX - (i*110 + 100), 40)
+        table.insert(enemiesNextWave, enemy2)
       end
       enemyKillTrigger = 3
    
