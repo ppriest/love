@@ -12,7 +12,7 @@ local winWidth
 local winHeight
 local offsetX
 local offsetY
-local fullscreen = false
+local fullscreen = true
 local mobile = false
 
 -- call after toggling fullscreen/window

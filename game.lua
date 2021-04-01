@@ -1,4 +1,5 @@
 require ('slam')
+local flux = require ("flux/flux")
 
 -- TODO
 -- Boss mode, play boss music when there is a boss onscreen
@@ -58,7 +59,7 @@ local enemyKillTrigger
 -- config
 local joystickDeadzone = 0.20
 local easyMode = false
-local startLevel = 4
+local startLevel = 1
 local powerupChance = 0.5
 local droneShootPeriod = 0.6 -- seconds
 
@@ -202,12 +203,12 @@ function game.spawnEnemies(gameX, gameY)
   if easyMode then
     if level == 1 then
       music = "dramatic"
-      local enemy = EnemyBlue(90 + 100, 180)
-      table.insert(enemies, enemy)
+      table.insert(enemies, EnemyUrn(90 + 100, 180))
+      
     elseif level == 2 then
       music = "bossfight"
-      local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
-      table.insert(enemies, enemy)
+      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20))
+      
     else
       if(winTime < 0) then
         winTime = gameTime
@@ -219,49 +220,35 @@ function game.spawnEnemies(gameX, gameY)
   else
     if level == 1 then
       music = "dramatic"
-        
       for i=0,6 do
-        local enemy = EnemyBlue(i*90 + 100, 180)
-        table.insert(enemies, enemy)
+        table.insert(enemies, EnemyBlue(i*90 + 100, 180))
       end
             
     elseif level == 2 then
       music = "dramatic"
-      
       for i=0,10 do
-        local enemy = EnemyRed(i*70 + 30, 120)
-        table.insert(enemies, enemy)
+        table.insert(enemies, EnemyRed(i*70 + 30, 120))
       end
-      
       for i=0,12 do
-        local enemy = EnemyBlue(i*45 + 100, 180)
-        table.insert(enemies, enemy)
+        table.insert(enemies, EnemyBlue(i*45 + 100, 180))
       end
       
     elseif level == 3 then
       music = "dramatic"
-      
       for i=0,1 do
-        local enemy = EnemyBlack(i*250 + 250, 25)
-        table.insert(enemies, enemy)
+        table.insert(enemies, EnemyBlack(i*250 + 250, 25))
       end
             
     elseif level == 4 then
       music = "bossfight"
-      
-      local enemy = EnemyBoss(gameX/2 - 32/2, 20)      
-      table.insert(enemies, enemy) 
-    
-      for i=0,2 do
-        local enemy2 = EnemyBlack(i*110 + 100, 40)
-        table.insert(enemies, enemy2)
-      end
-      
-      for i=0,2 do
-        local enemy2 = EnemyBlack(gameX - (i*110 + 100), 40)
-        table.insert(enemiesNextWave, enemy2)
-      end
       enemyKillTrigger = 3
+      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
+      for i=0,2 do
+        table.insert(enemies, EnemyBlack(i*110 + 100, 40))
+      end
+      for i=0,2 do
+        table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
+      end
    
     else
       -- music = "win"
@@ -385,16 +372,10 @@ function game.update(dt, gameX, gameY)
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
           
-          local max = #shotStrings * math.ceil(1.0/powerupChance)
-          local powerupType = math.random(1,max)
-          if powerupType <= #shotStrings then
-            local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
-            table.insert(powerups, powerup)
-          end
+          game.spawnPowerup(enemy, powerups)
           
           if enemy:is(EnemyUrn) then
-            local enemy2 = EnemyBlue(enemy:getX(), enemy:getY()-20)
-            table.insert(enemies, enemy2)
+            game.destroyUrn(enemy, enemies)
           end
         end
         -- mark the shot to be removed
@@ -417,16 +398,10 @@ function game.update(dt, gameX, gameY)
           table.insert(remEnemy, ii)
           score = score + enemy:getScore()
           
-          local max = #shotStrings * math.ceil(1.0/powerupChance)
-          local powerupType = math.random(1,max)
-          if powerupType <= #shotStrings then
-            local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
-            table.insert(powerups, powerup)
-          end
+          game.spawnPowerup(enemy, powerups)
           
           if enemy:is(EnemyUrn) then
-            local enemy2 = EnemyBlue(enemy:getX(), enemy:getY())
-            table.insert(enemies, enemy2)
+            game.destroyUrn(enemy, enemies)
           end
 
         end
@@ -493,9 +468,28 @@ function game.update(dt, gameX, gameY)
 
 end
 
+function game.destroyUrn(enemy, enemies)
+  local swarmNum = 10
+  for i=0,(swarmNum-1) do
+    local enemy2 = EnemyBlue(enemy:getX(), enemy:getY()-20)
+    flux.to(enemy2, 2, { x = enemy:getX() + 120*math.cos(i * 2*math.pi / swarmNum), 
+                         y = enemy:getY() + 80*math.sin(i * 2*math.pi / swarmNum) }):ease("backout")
+    table.insert(enemies, enemy2)
+  end
+end
+
+function game.spawnPowerup(enemy, powerups)
+  local max = #shotStrings * math.ceil(1.0/powerupChance)
+  local powerupType = math.random(1,max)
+  if powerupType <= #shotStrings then
+    local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
+    table.insert(powerups, powerup)
+  end
+end
+          
 function game.draw(gameX, gameY)  -- let's draw a background
 
-  love.graphics.setColor(0.08,0,0.08,1.0)
+  love.graphics.setColor(0.0,0,0.08,1.0)
   love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   if(flagWin) then
     local alpha = (gameTime-winTime)/5

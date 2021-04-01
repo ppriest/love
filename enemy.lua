@@ -1,7 +1,10 @@
+local flux = require ("flux/flux")
 local resource_manager = require("resource_manager")
 local GameObject = require("game_object")
 
 local Enemy = GameObject:extend()
+
+local invulnerableDuration = 0.5
 
 function Enemy:new(x, y, speed, health, score, soundName, quadName)
   Enemy.super.new(self, x, y, quadName, 3)
@@ -11,6 +14,9 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName)
   self.soundName = soundName
 
   self.timeLastDamaged = 0
+  
+  self.a = 0
+  flux.to(self, invulnerableDuration, { a = 1 }):ease("linear")
 end
 
 function Enemy:getScore()
@@ -35,7 +41,10 @@ function Enemy:hit(disable)
     self.speed = 0
   end
   
-  self.health = self.health - 1
+  if self.time > invulnerableDuration then
+    self.health = self.health - 1
+  end
+    
   if (self.health == 0) then
     resource_manager.playSound(self.soundName)
   end
