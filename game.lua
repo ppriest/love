@@ -386,10 +386,8 @@ function game.update(dt, gameX, gameY)
           end
           
           if enemy:is(EnemyUrn) then
-            print ('1 enemies: ' .. #enemies)
             local enemy2 = EnemyBlue(enemy:getX(), enemy:getY()-20)
             table.insert(enemies, enemy2)
-            print ('2 enemies: ' .. #enemies)
           end
         end
         -- mark the shot to be removed

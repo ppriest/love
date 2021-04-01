@@ -4,7 +4,6 @@ local GameObject = require("game_object")
 local Enemy = GameObject:extend()
 
 function Enemy:new(x, y, speed, health, score, soundName, quadName, healthDamage, quadName2)
-  print("quadname: " .. quadName)
   Enemy.super.new(self, x, y, quadName, 3)
   self.speed = speed or 1
   self.health = health or 1
