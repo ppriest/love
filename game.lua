@@ -269,7 +269,7 @@ function game.spawnEnemies(gameX, gameY)
     elseif level == 6 then
       music = "dramatic"
       for i=0,2 do
-        table.insert(enemies, EnemyUrn(i*90 + 100, 180))
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,3,gameX), 100))
       end
       
     elseif level == 15 then
@@ -294,6 +294,10 @@ function game.spawnEnemies(gameX, gameY)
   end
   
   resource_manager.playMusic(music)
+end
+
+function spreadEnemy(i,border,numEnemies,gameX)
+  return i*((gameX - border)/(numEnemies-1)) + border/2
 end
 
 -- for an object at X location objectX, find whether the nearest enemy (horizontally) is left/right
