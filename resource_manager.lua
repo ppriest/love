@@ -38,7 +38,7 @@ function resource_manager.load()
   image1Quads["boss_damage"] =    {quad=love.graphics.newQuad(3*tS,2*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
   image1Quads["boss_damage2"] =   {quad=love.graphics.newQuad(3*tS,4*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
   image1Quads["urn"] =            {quad=love.graphics.newQuad(0*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["urn_red"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  image1Quads["red_urn"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   
   --hero
   image1Quads["hero"] = {quad=love.graphics.newQuad(5*tS,5*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
@@ -86,6 +86,10 @@ end
 
 function resource_manager.getQuad(quadName)
   local entry = image1Quads[quadName]
+  if entry == nil then
+    print("resource_manager: requested non-existing: " .. quadName)
+    return
+  end
   return entry.image, entry.quad
 end
 

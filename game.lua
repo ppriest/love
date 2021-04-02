@@ -6,7 +6,8 @@ local flux = require ("flux/flux")
 -- Sword and boom power-ups
 -- Certain enemies have certain drops
 -- Enemies fight back
---save progress (high score, killed rare enemy ecs.)
+-- Save progress (high score, killed rare enemy etc.)
+-- Weapon specific sprites
 
 local game = {}
 
@@ -23,6 +24,7 @@ local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
 local EnemyUrn = require("enemy_urn")
+local EnemyRedUrn = require("enemy_redurn")
 local ShotObject = require("shot_object")
 local Powerup = require("powerup")
 
@@ -119,7 +121,7 @@ function game.shoot()
   end
   
   local instance = resource_manager.playSound("shot")
-  instance:setPitch(.5 + math.random() * .5)
+  instance:setPitch(.5 + love.math.random() * .5)
 end
 
 function game.chooseShotType(mode)
@@ -271,6 +273,49 @@ function game.spawnEnemies(gameX, gameY)
       for i=0,2 do
         table.insert(enemies, EnemyUrn(spreadEnemy(i,400,3,gameX), 100))
       end
+    elseif level == 7 then
+      music = "dramatic"
+      for i=0,4 do
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,3,gameX), 25))
+      end
+    elseif level == 8 then
+      music = "dramatic"
+      enemyKillTrigger = 3
+      for i=0,2 do
+        table.insert(enemies, EnemyPurple(spreadEnemy(i,400,3,gameX), 100))
+      end
+      for i=0,4 do
+        table.insert(enemies, EnemyRed(spreadEnemy(i,150,5,gameX), 25))
+      end
+      for i=0,0 do
+        table.insert(enemiesNextWave, EnemyBlack(spreadEnemy(i,200,1,gameX), 100))
+      end
+    elseif level == 9 then
+      music = "dramatic"
+      enemyKillTrigger = 2
+      for i=0,2 do
+        table.insert(enemies, EnemyPurple(spreadEnemy(i,400,3,gameX), 100))
+      end
+      for i=0,4 do
+        table.insert(enemiesNextWave, EnemyUrn(spreadEnemy(i,400,3,gameX), 0))
+      end
+      for i=0,7 do
+        table.insert(enemiesNextWave, EnemyRed(spreadEnemy(i,200,8,gameX), 0))
+      end
+     elseif level == 10 then
+      music = "bossfight"
+      enemyKillTrigger = 3
+      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
+      for i=0,1 do
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,500,2,gameX), -25))
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,450,2,gameX), -50))
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,2,gameX), -75))
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,350,2,gameX), -100))
+      end
+    elseif level == 11 then
+      enemyKillTrigger = 6
+      table.insert(enemies, EnemyRedUrn(gameX/2 - 32/2, 20))
+      table.insert(enemiesNextWave, EnemyBlack(gameX/2 - 32/2, 20) ) 
       
     elseif level == 15 then
       music = "bossfight"
@@ -297,6 +342,9 @@ function game.spawnEnemies(gameX, gameY)
 end
 
 function spreadEnemy(i,border,numEnemies,gameX)
+  if numEnemies == 1 then
+    return gameX/2
+  end
   return i*((gameX - border)/(numEnemies-1)) + border/2
 end
 
@@ -489,7 +537,7 @@ function game.update(dt, gameX, gameY)
   end
   
   -- secret spawn
-  local rare = math.random(1,100/dt)
+  local rare = love.math.random(1,100/dt)
   if rare == 1 then
     for i=0,6 do
         local enemy = EnemyBlue(i*90 + 100, 180)
@@ -506,9 +554,18 @@ function game.update(dt, gameX, gameY)
 end
 
 function game.destroyUrn(enemy, enemies)
-  local swarmNum = 10
+  local swarmNum = 10 
+  if enemy:is(EnemyRedUrn) then
+    swarmNum = 7
+  end
+    
   for i=0,(swarmNum-1) do
-    local enemy2 = EnemyBlue(enemy:getX(), enemy:getY()-20)
+    local enemy2
+    if enemy:is(EnemyRedUrn) then
+      enemy2 = EnemyRed(enemy:getX(), enemy:getY())
+    else
+      enemy2 = EnemyBlue(enemy:getX(), enemy:getY())
+    end
     flux.to(enemy2, 2, { x = enemy:getX() + 120*math.cos(i * 2*math.pi / swarmNum), 
                          y = enemy:getY() + 80*math.sin(i * 2*math.pi / swarmNum) }):ease("backout")
     table.insert(enemies, enemy2)
@@ -517,7 +574,7 @@ end
 
 function game.spawnPowerup(enemy, powerups)
   local max = #shotStrings * math.ceil(1.0/powerupChance)
-  local powerupType = math.random(1,max)
+  local powerupType = love.math.random(1,max)
   if powerupType <= #shotStrings then
     local powerup = Powerup(enemy:getX() + enemy:getWidth()/2, enemy:getY(), 150, powerupType)
     table.insert(powerups, powerup)
@@ -528,7 +585,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
 
   local hour = tonumber(os.date("%H"))
    if hour <=10 and hour >= 7 then
-        love.graphics.setColor(0.18,0,0.03,1)
+        love.graphics.setColor(0.45,0.2,0.07,1)
   elseif hour <=6 or hour >= 21 then
         love.graphics.setColor(0,0,0,1)
   elseif hour <=20 and hour >= 18 then
