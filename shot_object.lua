@@ -27,6 +27,10 @@ function ShotObject:getDisable()
   return self.disable
 end
 
+function ShotObject:getRemoveOnImpact()
+  return true
+end
+
 function ShotObject:hit()
   self.inert = true
   self.timeLastDamage = self.time

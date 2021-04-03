@@ -12,7 +12,7 @@ local winWidth
 local winHeight
 local offsetX
 local offsetY
-local fullscreen = false
+local fullscreen = true
 local mobile = false
 
 -- call after toggling fullscreen/window
@@ -83,7 +83,7 @@ function love.keypressed(k)
   local digit = string.byte(k)-48
   
   if digit >= 0 and digit <= 9 then -- switch weapons
-    game.chooseShotType(digit)
+    game.chooseWeaponType(digit)
   elseif k == "space" then
     game.shoot()
   elseif k == 'escape' then -- fullscreen->window->quit

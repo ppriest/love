@@ -40,8 +40,8 @@ local enemies
 local enemiesNextWave
 local powerups
 local maxShotNumber
-local shotSpeed
-local shotType
+local curShotSpeed
+local weaponType
 
 -- game state
 local flagStopped
@@ -71,10 +71,10 @@ function game.droneShoot()
   if #shotObjects >= maxShotNumber then 
     return 
   end
-  if shotType == 5 then
+  if weaponType == 5 then
     local dx = drone:getX()+drone:getWidth()/2
     local dy = drone:getY()
-    table.insert(shotObjects, ShotNormal(dx, dy, shotSpeed))
+    table.insert(shotObjects, ShotNormal(dx, dy, curShotSpeed))
   end
 end
 local timer = cron.every(droneShootPeriod, game.droneShoot)
@@ -88,23 +88,23 @@ function game.shoot()
   local hx = hero:getX()+hero:getWidth()/2
   local hy = hero:getY()
 
-  if (shotType <= 7) then
+  if (weaponType <= 7) then
     local disable = false
-    if shotType == 7 then
+    if weaponType == 7 then
       disable = true
     end
     
-    if(shotType == 4) then
-      table.insert(shotObjects, ShotHoming(hx, hy, shotSpeed, disable))
+    if(weaponType == 4) then
+      table.insert(shotObjects, ShotHoming(hx, hy, curShotSpeed, disable))
     else
-      table.insert(shotObjects, ShotNormal(hx, hy, shotSpeed, disable))
+      table.insert(shotObjects, ShotNormal(hx, hy, curShotSpeed, disable))
     end
     
-    if shotType == 2 then
-      table.insert(shotObjects, ShotNormal(hx+10, hy+10, shotSpeed))
-      table.insert(shotObjects, ShotNormal(hx-10, hy+10, shotSpeed))
+    if weaponType == 2 then
+      table.insert(shotObjects, ShotNormal(hx+10, hy+10, curShotSpeed))
+      table.insert(shotObjects, ShotNormal(hx-10, hy+10, curShotSpeed))
     end
-  elseif (shotType == 8) then
+  elseif (weaponType == 8) then
       local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
       table.insert(shotObjects, ShotShuriken(hx, hy, dir))
   end
@@ -113,7 +113,7 @@ function game.shoot()
   instance:setPitch(.5 + love.math.random() * .5)
 end
 
-function game.chooseShotType(mode)
+function game.chooseWeaponType(mode)
   if flagStopped then
     return
   end
@@ -121,41 +121,41 @@ function game.chooseShotType(mode)
   lastPowerupTime = gameTime
   
   mode = mode or love.math.random(1,8)
-  shotType = mode
+  weaponType = mode
 
-  if shotType == 1 then -- normal
-    shotSpeed = 100
+  if weaponType == 1 then -- normal
+    curShotSpeed = 100
     maxShotNumber = 5
-  elseif shotType == 2 then -- triple shot
-    shotSpeed = 130
+  elseif weaponType == 2 then -- triple shot
+    curShotSpeed = 130
     maxShotNumber = 9
-  elseif shotType == 3 then -- fast firing
-    shotSpeed = 750
+  elseif weaponType == 3 then -- fast firing
+    curShotSpeed = 750
     maxShotNumber = 3
-  elseif shotType == 4 then -- homing bullets
-    shotSpeed = 110
+  elseif weaponType == 4 then -- homing bullets
+    curShotSpeed = 110
     maxShotNumber = 5
-  elseif shotType == 5 then -- drone
-    shotSpeed = 100
+  elseif weaponType == 5 then -- drone
+    curShotSpeed = 100
     maxShotNumber = 16
-  elseif shotType == 6 then -- boom
-    shotSpeed = 100
+  elseif weaponType == 6 then -- boom
+    curShotSpeed = 100
     maxShotNumber = 5
-  elseif shotType == 7 then -- disable
-    shotSpeed = 120
+  elseif weaponType == 7 then -- disable
+    curShotSpeed = 120
     maxShotNumber = 5
-  elseif shotType == 8 then -- glaive
-    shotSpeed = 0
+  elseif weaponType == 8 then -- glaive
+    curShotSpeed = 0
     maxShotNumber = 7
   else
-    shotSpeed = 0
+    curShotSpeed = 0
     maxShotNumber = 0
   end
 end
 
-function game.shotString(localShotType)
-  if localShotType >= 1 and localShotType <= #shotStrings then
-    return shotStrings[localShotType]
+function game.shotString(localWeaponType)
+  if localWeaponType >= 1 and localWeaponType <= #shotStrings then
+    return shotStrings[localWeaponType]
   end
   return "XXX"
 end
@@ -183,7 +183,7 @@ function game.reload(gameX, gameY, newLevel)
   lastPowerupTime = 0
   totalShotCount = 0
 
-  game.chooseShotType(1)
+  game.chooseWeaponType(1)
   hero = Hero(400, groundHeight-15, 150, "hero") 
   drone = Hero(400, groundHeight-15, 450, "drone1") 
   
@@ -338,40 +338,15 @@ function spreadEnemy(i,border,numEnemies,gameX)
 end
 
 function game.update(dt, gameX, gameY)
-  if flagPaused then
+  if flagStopped then
     return
   end
   
   gameTime = gameTime + dt
   timer:update(dt)
   
-  if flagStopped then
-    return
-  end
-  
-  local dir = 0
-  
-  -- sticks
-  local joysticks = love.joystick.getJoysticks()
-  for i,joystick in ipairs(joysticks) do
-    if joystick:isGamepad() then
-      local value = joystick:getGamepadAxis('leftx')
-      if math.abs(value) > joystickDeadzone then
-        --dir = math.ceil(value)
-        dir = value
-      end
-    end
-  end
-  
-  -- keyboard actions for our hero
-  if love.keyboard.isDown("left") then
-    dir = -1
-  elseif love.keyboard.isDown("right") then
-    dir = 1
-  end
-  
-  hero:update(dt, dir, gameX, gameY)
-  if shotType == 5 then
+  hero:update(dt, game.getHeroDirection(), gameX, gameY)
+  if weaponType == 5 then
     local dir = utilities.findNearestEnemyX(drone:getX() + drone:getWidth()/2, enemies)
     drone:update(dt, dir, gameX, gameY)
   end
@@ -387,9 +362,10 @@ function game.update(dt, gameX, gameY)
       table.insert(remPowerup, ii)
     end
     
-    if utilities.checkBoxCollisionC(hero, powerup) then
+    -- hero and powerup
+    if utilities.checkBoxCollision(hero, powerup) then
       table.insert(remPowerup, ii)
-      game.chooseShotType(powerup:getType())
+      game.chooseWeaponType(powerup:getType())
     end
   end
 
@@ -401,7 +377,7 @@ function game.update(dt, gameX, gameY)
     
     -- check for collision with enemies
     for ii,enemy in ipairs(enemies) do
-      if utilities.checkBoxCollisionC(shot, enemy) then    
+      if utilities.checkBoxCollision(shot, enemy) then    
         if(not shot:getInert() and enemy:hit(shot:getDisable())) then
           -- mark that enemy for removal
           table.insert(remEnemy, ii)
@@ -417,7 +393,7 @@ function game.update(dt, gameX, gameY)
         shot:hit() -- ensure that it won't do damage for another short period
         
         -- mark the shot to be removed
-        if not shot:is(ShotShuriken) then
+        if shot:getRemoveOnImpact() then
           table.insert(remShotObject, i)
         end
       end
@@ -442,7 +418,7 @@ function game.update(dt, gameX, gameY)
     enemy:update(dt)
 
     -- check for collision between enemy and hero
-    if utilities.checkBoxCollisionC(hero,enemy) then
+    if utilities.checkBoxCollision(hero,enemy) then
       flagStopped = true
       flagGameover = true
     end
@@ -458,8 +434,8 @@ function game.update(dt, gameX, gameY)
   if (totalEnemiesKilledThisLevel >= enemyKillTrigger) then
     for i,enemy in ipairs(enemiesNextWave) do
       table.insert(enemies, enemy)
-      enemiesNextWave[i] = nil
     end
+    enemiesNextWave = {}
   end
   
   -- secret spawn
@@ -477,6 +453,31 @@ function game.update(dt, gameX, gameY)
     game.spawnEnemies(gameX, gameY)
   end
 
+end
+
+function game.getHeroDirection()
+  local dir = 0
+  
+  -- sticks
+  local joysticks = love.joystick.getJoysticks()
+  for i,joystick in ipairs(joysticks) do
+    if joystick:isGamepad() then
+      local value = joystick:getGamepadAxis('leftx')
+      if math.abs(value) > joystickDeadzone then
+        --dir = math.ceil(value)
+        dir = value
+      end
+    end
+  end
+  
+  -- keyboard actions for our hero
+  if love.keyboard.isDown("left") then
+    dir = -1
+  elseif love.keyboard.isDown("right") then
+    dir = 1
+  end
+  
+  return dir
 end
 
 function game.destroyUrn(enemy, enemies)
@@ -537,7 +538,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
   love.graphics.rectangle("fill", 0, groundHeight, gameX, gameY-groundHeight)
   
   -- draw hero
-  if shotType == 5 then
+  if weaponType == 5 then
     drone:draw()
   end
   hero:draw()
@@ -558,7 +559,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
     love.graphics.setColor(1,1,1,1)
     local border = 10
     love.graphics.printf( "Level: " .. level, gameX-250-border, 10, 400/1.8, "right") 
-    love.graphics.printf( "Shot: " .. game.shotString(shotType), border, 50, 400/1.8, "left", -0.1, 1.8, 1.6) 
+    love.graphics.printf( "Shot: " .. game.shotString(weaponType), border, 50, 400/1.8, "left", -0.1, 1.8, 1.6) 
     love.graphics.printf( "Score: " .. score, gameX-400-border, 10, 400/1.8, "right", 0.1, 1.8, 1.6) 
     love.graphics.print("FPS: " .. tostring(love.timer.getFPS( )), 10, 10)
        

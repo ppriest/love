@@ -37,4 +37,8 @@ function ShotShuriken:update(dt, game_x, game_y)
   return false
 end
 
+function ShotShuriken:getRemoveOnImpact()
+  return false
+end
+
 return ShotShuriken

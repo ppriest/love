@@ -10,18 +10,9 @@ end
 function utilities.ripairs(t)
     return reversedipairsiter, t, #t + 1
 end
-  
--- Collision detection function.
--- Checks if a an d b overlap.
--- w and h mean width and height.
-function utilities.checkBoxCollision(ax1,ay1,aw,ah,bx1,by1,bw,bh)
-  return ax1 < (bx1 + bw) and 
-         (ax1 + aw) > bx1 and 
-         ay1 < (by1 + bh) and 
-         (ay1 + ah) > by1
-end
 
-function utilities.checkBoxCollisionC(a,b)
+-- Test collision between any two GameObjects
+function utilities.checkBoxCollision(a,b)
   return a:getX() < (b:getX() + b:getWidth()) and 
         (a:getX() + a:getWidth()) > b:getX() and 
          a:getY() < (b:getY() + b:getHeight()) and 
