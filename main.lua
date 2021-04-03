@@ -12,7 +12,7 @@ local winWidth
 local winHeight
 local offsetX
 local offsetY
-local fullscreen = true
+local fullscreen = false
 local mobile = false
 
 -- call after toggling fullscreen/window
@@ -132,8 +132,6 @@ function love.draw()
   
   game.draw(gameX, gameY)
 
-  love.graphics.setColor(1,1,1,1)
-  love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
   if mobile then
     --touchoverlay.draw()
   end

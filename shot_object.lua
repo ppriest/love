@@ -10,15 +10,21 @@ function ShotObject:new(x, y, quadName, scale)
 
   self.initX = x or 0
   self.initY = y or 0
-  self.height = 1
-  self.width = 1
+  self.height = 5
+  self.width = 2
 
   self.timeLastDamage = 0
   self.inert = false
+  self.disable = false
 end
 
 function ShotObject:getInert()
   return self.inert
+end
+
+function ShotObject:getDisable()
+  print('shot disable: ' ,self.disable)
+  return self.disable
 end
 
 function ShotObject:hit()

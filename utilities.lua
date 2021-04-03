@@ -28,6 +28,35 @@ function utilities.checkBoxCollisionC(a,b)
         (a:getY() + a:getHeight()) > b:getY()
 end
 
+-- for an object at X location objectX, find whether the nearest enemy (horizontally) is left/right
+function utilities.findNearestEnemyX(objectX, enemies)
+  local enemyDist = nil
+  local enemyDir = 0
+  local enemyX = objectX
+
+  -- find closest
+
+  for ii,enemy in ipairs(enemies) do
+    local thisEnemyX = enemy:getX() + enemy:getWidth()/2
+    if (enemyDist == nil or (math.abs(objectX - thisEnemyX) < enemyDist)) then
+      enemyDist = math.abs(objectX - thisEnemyX)
+      enemyX = thisEnemyX
+    end
+  end
+
+  if(enemyDist < 3) then
+    -- stop oscillation
+    enemyDir = 0
+  elseif(objectX > enemyX) then
+    enemyDir = -1
+  elseif (objectX < enemyX) then
+    enemyDir = 1
+  end
+  
+  return enemyDir
+end
+
+
 function utilities.gradientMesh(dir, ...)
     -- Check for direction
     local isHorizontal = true
