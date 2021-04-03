@@ -20,6 +20,7 @@ local Hero = require("hero")
 local Enemy = require("enemy")
 local EnemyBlue= require("enemy_blue")
 local EnemyRed = require("enemy_red")
+local EnemySubBoss = require("enemy_sub_boss")
 local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
@@ -59,7 +60,7 @@ local enemyKillTrigger
 
 -- config
 local joystickDeadzone = 0.20
-local easyMode = false
+local easyMode = true
 local startLevel = 1
 local powerupChance = 0.15
 local droneShootPeriod = 0.6 -- seconds
@@ -213,8 +214,9 @@ function game.spawnEnemies(gameX, gameY)
   if easyMode then
     if level == 1 then
       music = "dramatic"
-      table.insert(enemies, EnemyUrn(90 + 100, 180))
-      
+      --table.insert(enemies, EnemyUrn(90 + 100, 180))
+      table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
+     
     elseif level == 2 then
       music = "bossfight"
       table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20))
