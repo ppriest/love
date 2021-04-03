@@ -84,6 +84,8 @@ function love.keypressed(k)
   
   if digit >= 0 and digit <= 9 then -- switch weapons
     game.chooseShotType(digit)
+  elseif k == "space" then
+    game.shoot()
   elseif k == 'escape' then -- fullscreen->window->quit
     --if fullscreen then
     --  initDisplay(false)
@@ -102,12 +104,6 @@ function love.keypressed(k)
     game.togglePause()
   elseif k == 'g' then -- dump globals
     globals.dump(_G,"")
-  end
-end
-
-function love.keyreleased(key)
-  if (key == "space") then
-    game.shoot()
   end
 end
 
