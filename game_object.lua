@@ -7,13 +7,13 @@ local flashTime = 0.1
 function GameObject:new(x, y, quadName, scale)
   self.x = x or 0
   self.y = y or 0
-  self.height = 15
-  self.width = 30
   self.quadName = quadName or nil
   self.scale = scale or 1
 
-  -- scale up the graphics
-  -- hitbox is smaller than enemy, and centered
+  self.offsetX = 0
+  self.offsetY = 0
+  self.height = 15
+  self.width = 30
   GameObject.recalcScale(self)
   
   self.r = 1
@@ -27,6 +27,10 @@ function GameObject:new(x, y, quadName, scale)
 end
 
 function GameObject:recalcScale()
+  if not self.quadName then
+    return
+  end
+
   local image, quad = resource_manager.getQuad(self.quadName)
   local x, y, width, height = quad:getViewport()
   self.offsetX = -(self.scale*width*0.6)/2
@@ -71,9 +75,7 @@ function GameObject:update(dt)
 end
 
 function GameObject:draw()
-  local image, quad = resource_manager.getQuad(self.quadName)
   local shader = resource_manager.getShader("white")
-  
   if self.flashing then
     love.graphics.setShader(shader)
   else
@@ -81,7 +83,13 @@ function GameObject:draw()
   end
   
   love.graphics.setColor(self.r,self.g,self.b,self.a)
-  love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
+  
+  if self.quadName then
+    local image, quad = resource_manager.getQuad(self.quadName)
+    love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
+  else
+    love.graphics.rectangle("fill", self.x, self.y, self.width, self.height) 
+  end
   
   if showHitbox then
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height) 

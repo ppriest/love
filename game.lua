@@ -25,7 +25,7 @@ local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
 local EnemyUrn = require("enemy_urn")
 local EnemyRedUrn = require("enemy_redurn")
-local ShotObject = require("shot_object")
+local ShotShuriken = require("shot_shuriken")
 local Powerup = require("powerup")
 
 -- game objects
@@ -116,7 +116,7 @@ function game.shoot()
     end
   elseif (shotType == 8) then
       local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
-      local shotObject = ShotObject(hx, hy, dir)
+      local shotObject = ShotShuriken(hx, hy, dir)
       table.insert(shotObjects, shotObject)
   end
   
@@ -350,7 +350,7 @@ end
 
 -- for an object at X location objectX, find whether the nearest enemy (horizontally) is left/right
 local function findNearestEnemyX(objectX)
-  local enemyDist = 9999
+  local enemyDist = nil
   local enemyDir = 0
   local enemyX = objectX
 
@@ -358,7 +358,7 @@ local function findNearestEnemyX(objectX)
 
   for ii,enemy in ipairs(enemies) do
     local thisEnemyX = enemy:getX() + enemy:getWidth()/2
-    if ((math.abs(objectX - thisEnemyX) < enemyDist) or enemyDist == 9999) then
+    if (enemyDist == nil or (math.abs(objectX - thisEnemyX) < enemyDist)) then
       enemyDist = math.abs(objectX - thisEnemyX)
       enemyX = thisEnemyX
     end
