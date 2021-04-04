@@ -10,6 +10,8 @@ local speed = 2.0
 function ShotShuriken:new(x, y, dir)
   ShotShuriken.super.new(self, x, y, "glaive1", 2)
   self.dir = dir or 1
+  self.height = 10
+  self.width = 10
 end
 
 function ShotShuriken:update(dt, game_x, game_y)
