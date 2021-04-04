@@ -61,7 +61,7 @@ local enemyKillTrigger
 
 -- config
 local joystickDeadzone = 0.20
-local easyMode = false
+local easyMode = true
 local startLevel = 1
 local powerupChance = 0.15
 local droneShootPeriod = 0.6 -- seconds
