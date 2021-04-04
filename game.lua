@@ -338,12 +338,18 @@ function spreadEnemy(i,border,numEnemies,gameX)
 end
 
 function game.update(dt, gameX, gameY)
-  if flagStopped then
+  -- if paused, then gametime should stop
+  if flagPaused then
     return
   end
   
   gameTime = gameTime + dt
   timer:update(dt)
+  
+  -- if stopped (other than pause) then allow gameitme to continue
+  if flagStopped then
+    return
+  end
   
   hero:update(dt, game.getHeroDirection(), gameX, gameY)
   if weaponType == 5 then
