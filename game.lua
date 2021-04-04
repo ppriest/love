@@ -385,7 +385,7 @@ function game.update(dt, gameX, gameY)
   -- check for collision with enemies
   for ii,enemy in ipairs(enemies) do
     for jj,shot in ipairs(shotObjects) do
-      if utilities.checkBoxCollision(shot, enemy) then    
+      if enemy:checkCollision(shot) then    
         if(not shot:getInert() and enemy:hit(shot:getDisable())) then
           -- mark that enemy for removal
           table.insert(remEnemy, ii)

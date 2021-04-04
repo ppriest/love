@@ -1,5 +1,7 @@
 local flux = require ("flux/flux")
 local resource_manager = require("resource_manager")
+local utilities = require("utilities")
+
 local GameObject = require("game_object")
 
 local Enemy = GameObject:extend()
@@ -55,6 +57,10 @@ end
 
 function Enemy:draw()
   Enemy.super.draw(self)
+end
+
+function Enemy:checkCollision(shot)
+  return utilities.checkBoxCollision(shot, self)
 end
 
 return Enemy
