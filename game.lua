@@ -265,7 +265,7 @@ function game.spawnEnemies(gameX, gameY)
     elseif level == 7 then
       music = "dramatic"
       for i=0,4 do
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,3,gameX), 25))
+        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,5,gameX), 25))
       end
     elseif level == 8 then
       music = "dramatic"
@@ -374,9 +374,11 @@ function game.update(dt, gameX, gameY)
     if shot:update(dt, gameX, gameY, enemies) then
       table.insert(remShotObject, i)
     end
+  end
     
-    -- check for collision with enemies
-    for ii,enemy in ipairs(enemies) do
+  -- check for collision with enemies
+  for ii,enemy in ipairs(enemies) do
+    for jj,shot in ipairs(shotObjects) do
       if utilities.checkBoxCollision(shot, enemy) then    
         if(not shot:getInert() and enemy:hit(shot:getDisable())) then
           -- mark that enemy for removal
@@ -394,7 +396,7 @@ function game.update(dt, gameX, gameY)
         
         -- mark the shot to be removed
         if shot:getRemoveOnImpact() then
-          table.insert(remShotObject, i)
+          table.insert(remShotObject, jj)
         end
       end
     end

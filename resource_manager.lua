@@ -119,6 +119,7 @@ function resource_manager.playMusic(musicName)
     if(musicCurrent ~= "") then
       music[musicCurrent]:stop()
     end
+    music[musicName]:setLooping(true)
     music[musicName]:play()
     musicCurrent = musicName
     return true
