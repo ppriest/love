@@ -285,7 +285,7 @@ function game.spawnEnemies(gameX, gameY)
     for i=0,2 do
       table.insert(enemies, EnemyPurple(game.spreadEnemy(i,400,3,gameX), 100))
     end
-    for i=0,4 do
+    for i=0,2 do
       table.insert(enemiesNextWave, EnemyUrn(game.spreadEnemy(i,400,3,gameX), 0))
     end
     for i=0,7 do
