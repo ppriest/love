@@ -21,7 +21,6 @@ function ShotObject:getInert()
 end
 
 function ShotObject:getDisable()
-  print('shot disable: ' ,self.disable)
   return self.disable
 end
 

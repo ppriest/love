@@ -302,14 +302,24 @@ function game.spawnEnemies(gameX, gameY)
     
   elseif level == 12 then
     music = "dramatic"
-    
-  elseif level == 13 then
-    music = "dramatic"
-    
-  elseif level == 14 then
-    music = "dramatic"
-    
+    for i=0,11 do
+     table.insert(enemiesNextWave, EnemyBlue(game.spreadEnemy(i,300,12,gameX), 50))
+    end
+    for i=0,9 do
+     table.insert(enemiesNextWave, EnemyRed(game.spreadEnemy(i,300,10,gameX), 65))
+    end
+    for i=0,4 do
+    table.insert(enemiesNextWave, EnemyUrn(game.spreadEnemy(i,500,5,gameX), 80))
+  end
+  
   elseif level == 15 then
+  elseif level == 13 then
+
+
+
+
+
+
     music = "bossfight"
     enemyKillTrigger = 3
     table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
@@ -320,19 +330,20 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
     end
  
-  elseif level == 16 then
-    music = "dramatic"
-    
-  elseif level == 17 then
-    music = "dramatic"
-    
-  elseif level == 18 then
-    music = "dramatic"
-    
-  elseif level == 19 then
-    music = "dramatic"
-    
   elseif level == 20 then
+  elseif level == 14 then
+
+
+
+
+
+
+
+
+
+
+
+
     music = "bossfight"
     --table.insert(enemies, EnemyUrn(90 + 100, 180))
     table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
@@ -523,6 +534,8 @@ function game.draw(gameX, gameY)  -- let's draw a background
   elseif hour <=17 and hour >= 11 then
         love.graphics.setColor(0.1,0.05,0.05,1)
   end
+  --local hour = tonumber(os.date("%H"))
+  love.graphics.setColor(0,0.02,0.1,1)
   love.graphics.rectangle("fill", 0, 0, gameX, gameY)
   
   if(flagWin) then
