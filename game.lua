@@ -165,6 +165,7 @@ end
 
 function game.incLevel(gameX, gameY, incLevel)
   local newLevel = level + incLevel
+  if newLevel <=1 then newLevel = 1 end
   game.reload(gameX, gameY, newLevel)
 end
 
