@@ -10,8 +10,8 @@ function EnemySubBoss:new(x, y)
   self.speed = 4
   EnemySubBoss.super.new(self, x, y, self.speed, 50, 10, "death")
   self.scale = 4
-  self.width = 2*self.scale
-  self.height = 2*self.scale
+  self.width = 40*self.scale
+  self.height = 60*self.scale
   
   -- reuse sub-Enemies
   self.parts = {
@@ -43,34 +43,61 @@ function EnemySubBoss:hit(disable)
   return (self.health <= 0)
 end
 
-function EnemySubBoss:checkCollision(shot)
-  --if(not shot:getInert() and self.hit(self, shot:getDisable())) then  
-  
-  
+
+function EnemySubBoss:checkCollision(shot, enemies)
   local hit = false
-  for ii, part in pairs(self.parts) do
-    ii = ii
-    if utilities.checkBoxCollision(shot, part) then
-      hit = true
-    end
-  end
+  local kill = false
   
   if utilities.checkBoxCollision(shot, self) then
     hit = true
+    if not shot:getInert() and self.hit(self, shot:getDisable()) then
+      kill = true
+    end
   end
   
-  return hit
+  return hit,kill
+end
+
+function EnemySubBoss:checkCollision(shot)
+  local hit = false
+  local kill = false
+  local remPart = {}
+
+  for ii, part in pairs(self.parts) do
+    if utilities.checkBoxCollision(shot, part) then
+      hit = true
+      if not shot:getInert() and part.hit(part, false) then
+        table.insert(remPart, ii)
+      end
+    end
+  end
+  
+  for ii,part in utilities.ripairs(remPart) do
+    ii = ii
+    table.remove(self.parts, part)
+  end 
+  
+  if #self.parts == 0 then
+    if utilities.checkBoxCollision(shot, self) then
+      hit = true
+      if not shot:getInert() and self.hit(self, false) then
+        kill = true
+      end
+    end
+  end
+  
+  return hit,kill
 end
 
 function EnemySubBoss:draw()
-  --local shader = resource_manager.getShader("white")
+  local shader = resource_manager.getShader("white")
   
   -- hittable areas
-  --if self.flashing then
-    --love.graphics.setShader(shader)
-  --else
+  if self.flashing then
+    love.graphics.setShader(shader)
+  else
     love.graphics.setShader()
-  --end  
+  end  
   
   love.graphics.setColor(self.r,self.g,self.b,self.a)
  
