@@ -39,8 +39,6 @@ end
 function Enemy:hit(disable)
   Enemy.super.startFlash(self)
   
-  --print('disable: ' .. tonumber(disable))
-  
   if disable then
     self.speed = 0
   end
