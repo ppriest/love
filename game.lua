@@ -302,6 +302,12 @@ function game.spawnEnemies(gameX, gameY)
   elseif level == 12 then
     music = "dramatic"
     
+  elseif level == 13 then
+    music = "dramatic"
+    
+  elseif level == 14 then
+    music = "dramatic"
+    
   elseif level == 15 then
     music = "bossfight"
     enemyKillTrigger = 3
@@ -313,6 +319,18 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
     end
  
+  elseif level == 16 then
+    music = "dramatic"
+    
+  elseif level == 17 then
+    music = "dramatic"
+    
+  elseif level == 18 then
+    music = "dramatic"
+    
+  elseif level == 19 then
+    music = "dramatic"
+    
   elseif level == 20 then
     music = "bossfight"
     --table.insert(enemies, EnemyUrn(90 + 100, 180))
