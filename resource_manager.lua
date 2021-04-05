@@ -4,7 +4,7 @@ local utilities = require("utilities")
 
 -- resources
 local images = {}
-local image1Quads = {}
+local quads = {}
 local gradient
 local music = {}
 local sound = {}
@@ -26,42 +26,42 @@ function resource_manager.load()
   local image1 = images["characters"]
   
   --enemies
-  image1Quads["blue"] =           {quad=love.graphics.newQuad(0*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["red"] =            {quad=love.graphics.newQuad(1*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["red_damage"] =     {quad=love.graphics.newQuad(1*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["black"] =          {quad=love.graphics.newQuad(2*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["black_damage1"] =  {quad=love.graphics.newQuad(2*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["black_damage2"] =  {quad=love.graphics.newQuad(2*tS,2*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["purple"] =         {quad=love.graphics.newQuad(0*tS,4*tS,3*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["purple_damage1"] = {quad=love.graphics.newQuad(0*tS,5*tS,3*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["boss"] =           {quad=love.graphics.newQuad(3*tS,0*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
-  image1Quads["boss_damage"] =    {quad=love.graphics.newQuad(3*tS,2*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
-  image1Quads["boss_damage2"] =   {quad=love.graphics.newQuad(3*tS,4*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
-  image1Quads["urn"] =            {quad=love.graphics.newQuad(0*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["red_urn"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["blue"] =           {quad=love.graphics.newQuad(0*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["red"] =            {quad=love.graphics.newQuad(1*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["red_damage"] =     {quad=love.graphics.newQuad(1*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["black"] =          {quad=love.graphics.newQuad(2*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["black_damage1"] =  {quad=love.graphics.newQuad(2*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["black_damage2"] =  {quad=love.graphics.newQuad(2*tS,2*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["purple"] =         {quad=love.graphics.newQuad(0*tS,4*tS,3*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["purple_damage1"] = {quad=love.graphics.newQuad(0*tS,5*tS,3*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["boss"] =           {quad=love.graphics.newQuad(3*tS,0*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
+  quads["boss_damage"] =    {quad=love.graphics.newQuad(3*tS,2*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
+  quads["boss_damage2"] =   {quad=love.graphics.newQuad(3*tS,4*tS,2*tS,2*tS,image1:getDimensions()), image=image1}
+  quads["urn"] =            {quad=love.graphics.newQuad(0*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["red_urn"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   
   --hero
   for ii=1,6,1
   do
-    image1Quads["hero" .. ii] = {quad=love.graphics.newQuad(5*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+    quads["hero" .. ii] = {quad=love.graphics.newQuad(5*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   end
  
   --drone
   for ii=1,5,1
   do
-    image1Quads["drone" .. ii] = {quad=love.graphics.newQuad (6*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+    quads["drone" .. ii] = {quad=love.graphics.newQuad (6*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   end
   
   --weapons
-  image1Quads["glaive1"] = {quad=love.graphics.newQuad (7*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["glaive2"] = {quad=love.graphics.newQuad (7*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["glaive1"] = {quad=love.graphics.newQuad (7*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  quads["glaive2"] = {quad=love.graphics.newQuad (7*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   
   images["powerups"] = love.graphics.newImage("art/powerups.png")
   local image2 = images["powerups"]
   
   for ii=1,8,1
   do
-    image1Quads["powerup" .. ii] = {quad=love.graphics.newQuad ((ii-1)*tS10,0*tS10,1*tS10,1*tS10,image2:getDimensions()), image=image2}   
+    quads["powerup" .. ii] = {quad=love.graphics.newQuad ((ii-1)*tS10,0*tS10,1*tS10,1*tS10,image2:getDimensions()), image=image2}   
   end
   
   
@@ -70,15 +70,15 @@ function resource_manager.load()
   local image3 = images["sub_boss"]
   
   --enemies
-  image1Quads["sub_boss_main"] =  {quad=love.graphics.newQuad(0*tS10,0*tS10,4*tS10,5*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_lwing"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_rwing"] = {quad=love.graphics.newQuad(4*tS10,2*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_cockpit"] = {quad=love.graphics.newQuad(5*tS10,4*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_cockpit_dmg"] = {quad=love.graphics.newQuad(5*tS10,5*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_window"] = {quad=love.graphics.newQuad(5*tS10,3*tS10,1*tS10,1*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_window_dmg"] = {quad=love.graphics.newQuad(6*tS10,3*tS10,1*tS10,1*tS10,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_prop"] = {quad=love.graphics.newQuad(5*tS10,2*tS10,5,3,image3:getDimensions()), image=image3}
-  image1Quads["sub_boss_prop_dmg"] = {quad=love.graphics.newQuad(6*tS10,2*tS10,6,6,image3:getDimensions()), image=image3}
+  quads["sub_boss_main"] =  {quad=love.graphics.newQuad(0*tS10,0*tS10,4*tS10,5*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_lwing"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_rwing"] = {quad=love.graphics.newQuad(4*tS10,2*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_cockpit"] = {quad=love.graphics.newQuad(5*tS10,4*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_cockpit_dmg"] = {quad=love.graphics.newQuad(5*tS10,5*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_window"] = {quad=love.graphics.newQuad(5*tS10,3*tS10,1*tS10,1*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_window_dmg"] = {quad=love.graphics.newQuad(6*tS10,3*tS10,1*tS10,1*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_prop"] = {quad=love.graphics.newQuad(5*tS10,2*tS10,5,3,image3:getDimensions()), image=image3}
+  quads["sub_boss_prop_dmg"] = {quad=love.graphics.newQuad(6*tS10,2*tS10,6,6,image3:getDimensions()), image=image3}
 
   
    
@@ -105,7 +105,7 @@ end
 
 
 function resource_manager.getQuad(quadName)
-  local entry = image1Quads[quadName]
+  local entry = quads[quadName]
   if entry == nil then
     print("resource_manager: requested non-existing: " .. quadName)
     return

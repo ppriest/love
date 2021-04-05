@@ -1,4 +1,5 @@
 local Enemy = require("enemy")
+local EnemyBlack = require("enemy_black")
 local resource_manager = require("resource_manager")
 local utilities = require("utilities")
 
@@ -71,6 +72,17 @@ function EnemySubBoss:checkCollision(shot, enemies)
       hit = true
       if not shot:getInert() and self.hit(self, false) then
         kill = true
+      end
+    end
+  end
+  
+  -- randomly spawn black
+  if hit then
+    local rare = love.math.random(1,30)
+    if rare == 1 then
+      for i=0,6 do
+          local enemy = EnemyBlack(self.x + self.width/2 - 8, self.y + 20)
+          table.insert(enemies, enemy)
       end
     end
   end
