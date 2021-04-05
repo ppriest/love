@@ -119,6 +119,7 @@ function game.chooseWeaponType(mode)
   
   mode = mode or love.math.random(1,8)
   weaponType = mode
+  local heroImage = 1
 
   if weaponType == 1 then -- normal
     curShotSpeed = 100
@@ -126,12 +127,15 @@ function game.chooseWeaponType(mode)
   elseif weaponType == 2 then -- triple shot
     curShotSpeed = 130
     maxShotNumber = 9
+    heroImage = 2
   elseif weaponType == 3 then -- fast firing
     curShotSpeed = 750
     maxShotNumber = 3
+    heroImage = 4
   elseif weaponType == 4 then -- homing bullets
     curShotSpeed = 110
     maxShotNumber = 5
+    heroImage = 3
   elseif weaponType == 5 then -- drone
     curShotSpeed = 100
     maxShotNumber = 16
@@ -141,13 +145,17 @@ function game.chooseWeaponType(mode)
   elseif weaponType == 7 then -- disable
     curShotSpeed = 120
     maxShotNumber = 5
+    heroImage = 5
   elseif weaponType == 8 then -- glaive
     curShotSpeed = 0
     maxShotNumber = 7
+    heroImage = 6
   else
     curShotSpeed = 0
     maxShotNumber = 0
   end
+  
+  hero:setQuadName('hero' .. heroImage)
 end
 
 function game.shotString(localWeaponType)
@@ -181,8 +189,8 @@ function game.reload(gameX, gameY, newLevel)
   lastPowerupTime = 0
   totalShotCount = 0
 
+  hero = Hero(400, groundHeight-15, 150, "hero3") 
   game.chooseWeaponType(1)
-  hero = Hero(400, groundHeight-15, 150, "hero") 
   drone = Hero(400, groundHeight-15, 450, "drone1") 
   
   enemies = {}

@@ -41,14 +41,16 @@ function resource_manager.load()
   image1Quads["red_urn"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   
   --hero
-  image1Quads["hero"] = {quad=love.graphics.newQuad(5*tS,5*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  
+  for ii=1,6,1
+  do
+    image1Quads["hero" .. ii] = {quad=love.graphics.newQuad(5*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  end
+ 
   --drone
-  image1Quads["drone1"] = {quad=love.graphics.newQuad (6*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["drone2"] = {quad=love.graphics.newQuad (6*tS,1*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["drone3"] = {quad=love.graphics.newQuad (6*tS,2*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["drone4"] = {quad=love.graphics.newQuad (6*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
-  image1Quads["drone5"] = {quad=love.graphics.newQuad (6*tS,4*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  for ii=1,5,1
+  do
+    image1Quads["drone" .. ii] = {quad=love.graphics.newQuad (6*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
+  end
   
   --weapons
   image1Quads["glaive1"] = {quad=love.graphics.newQuad (7*tS,0*tS,1*tS,1*tS,image1:getDimensions()), image=image1}

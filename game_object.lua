@@ -63,6 +63,10 @@ function GameObject:getY()
   return self.y
 end
 
+function GameObject:setQuadName(quadName)
+  self.quadName = quadName
+end
+
 function GameObject:startFlash()
   self.flashing = true
   self.flashStartTime = self.time
@@ -88,6 +92,7 @@ function GameObject:draw()
   if self.quadName then
     local image, quad = resource_manager.getQuad(self.quadName)
     love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
+
   else
     love.graphics.rectangle("fill", self.x, self.y, self.width, self.height) 
   end
