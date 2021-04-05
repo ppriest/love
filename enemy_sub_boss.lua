@@ -4,14 +4,12 @@ local utilities = require("utilities")
 
 local EnemySubBoss = Enemy:extend()
 
-local showHitbox = false
-
 function EnemySubBoss:new(x, y)
   self.speed = 2
   EnemySubBoss.super.new(self, x, y, self.speed, 50, 10, "death")
   self.scale = 4
   self.width = 40*self.scale
-  self.height = 60*self.scale
+  self.height = 50*self.scale
   
   -- reuse sub-Enemies
   self.parts = {
@@ -103,7 +101,7 @@ function EnemySubBoss:draw()
     part:draw()
   end
 
-  if showHitbox then
+  if utilities.getShowHitbox() then
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height) 
   end
   
