@@ -14,13 +14,6 @@ end
 function ShotNormal:update(dt, game_x, game_y)
   ShotNormal.super.update(self, dt)
   self.y = self.y - dt*self.speed
-
---[[    if(shotType == 4) then 
-	    -- approach nearest in an arc
-      local enemyDir = findNearestEnemyX(shot.x)
-      local factor = ((500 - shot.y)/1000)
-      shot.x = shot.x + dt*shot.sp*enemyDir*factor
-    end]]
     
   if (self.y < 0 or self.y >= game_y or self.x < 0 or self.x > game_x) then
     return true

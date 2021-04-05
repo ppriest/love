@@ -89,26 +89,21 @@ function game.shoot()
   
   local hx = hero:getX()+hero:getWidth()/2
   local hy = hero:getY()
-
-  if (weaponType <= 7) then
-    local disable = false
-    if weaponType == 7 then
-      disable = true
-    end
-    
-    if(weaponType == 4) then
-      table.insert(shotObjects, ShotHoming(hx, hy, curShotSpeed, disable))
-    else
-      table.insert(shotObjects, ShotNormal(hx, hy, curShotSpeed, disable))
-    end
-    
-    if weaponType == 2 then
-      table.insert(shotObjects, ShotNormal(hx+10, hy+10, curShotSpeed))
-      table.insert(shotObjects, ShotNormal(hx-10, hy+10, curShotSpeed))
-    end
-  elseif (weaponType == 8) then
-      local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
-      table.insert(shotObjects, ShotShuriken(hx, hy, dir))
+  
+  -- shuriken, homing or normal
+  if(weaponType == 8) then
+    local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
+    table.insert(shotObjects, ShotShuriken(hx, hy, dir))
+  elseif(weaponType == 4) then
+    table.insert(shotObjects, ShotHoming(hx, hy, curShotSpeed))
+  else
+    table.insert(shotObjects, ShotNormal(hx, hy, curShotSpeed, weaponType == 7))
+  end
+  
+  -- extra for triple
+  if weaponType == 2 then
+    table.insert(shotObjects, ShotNormal(hx+10, hy+10, curShotSpeed))
+    table.insert(shotObjects, ShotNormal(hx-10, hy+10, curShotSpeed))
   end
   
   local instance = resource_manager.playSound("shot")
