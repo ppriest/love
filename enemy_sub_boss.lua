@@ -17,7 +17,13 @@ function EnemySubBoss:new(x, y)
   self.parts = {
     Enemy(self.x + -2*self.scale, self.y + (10*2)*self.scale, self.speed, 5, 0, "death", "sub_boss_lwing", self.scale, 1.0),
     Enemy(self.x + (10*3 + 5)*self.scale, self.y + (10*2)*self.scale, self.speed, 5, 0, "death", "sub_boss_rwing", self.scale, 1.0),
-    Enemy(self.x + 5*self.scale, self.y + (10*5 - 4)*self.scale, self.speed, 1, 0, "smash", "sub_boss_cockpit", self.scale, 1.0)
+    Enemy(self.x + 5*self.scale, self.y + (10*5 - 4)*self.scale, self.speed, 1, 0, "smash", "sub_boss_cockpit", self.scale, 1.0),
+    Enemy(self.x + 15*self.scale, self.y + 13*self.scale, self.speed, 10, 0, "smash", "sub_boss_window_dmg", self.scale, 1.0),
+    Enemy(self.x + 15*self.scale, self.y + 24*self.scale, self.speed, 10, 0, "smash", "sub_boss_window_dmg", self.scale, 1.0),
+    Enemy(self.x + 15*self.scale, self.y + 13*self.scale, self.speed, 1, 0, "smash", "sub_boss_window", self.scale, 1.0),
+    Enemy(self.x + 15*self.scale, self.y + 24*self.scale, self.speed, 1, 0, "smash", "sub_boss_window", self.scale, 1.0),
+    Enemy(self.x + 7*self.scale, self.y + 0*self.scale, self.speed, 3, 0, "death", "sub_boss_prop", self.scale, 1.0),
+    Enemy(self.x + 28*self.scale, self.y + 0*self.scale, self.speed, 3, 0, "death", "sub_boss_prop", self.scale, 1.0)
   }
 
 end
