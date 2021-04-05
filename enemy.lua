@@ -8,8 +8,8 @@ local Enemy = GameObject:extend()
 
 local invulnerableDuration = 0.5
 
-function Enemy:new(x, y, speed, health, score, soundName, quadName)
-  Enemy.super.new(self, x, y, quadName, 3)
+function Enemy:new(x, y, speed, health, score, soundName, quadName, scale, hitboxProportion)
+  Enemy.super.new(self, x, y, quadName, scale or 3, hitboxProportion or 0.6)
   self.speed = speed or 1
   self.health = health or 1
   self.score = score or 1
@@ -59,8 +59,19 @@ function Enemy:draw()
   Enemy.super.draw(self)
 end
 
-function Enemy:checkCollision(shot)
-  return utilities.checkBoxCollision(shot, self)
+-- first return is whether shot hit, second is if enemy is destroyed and should be removed
+function Enemy:checkCollision(shot, enemies)
+  local hit = false
+  local kill = false
+  
+  if utilities.checkBoxCollision(shot, self) then
+    hit = true
+    if not shot:getInert() and self.hit(self, shot:getDisable()) then
+      kill = true
+    end
+  end
+  
+  return hit,kill
 end
 
 return Enemy

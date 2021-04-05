@@ -1,8 +1,6 @@
 local GameObject = require("game_object")
 local ShotObject = GameObject:extend()
 
-local resource_manager = require("resource_manager")
-
 local inertTime = 0.1 -- won't damage again for this long
 
 function ShotObject:new(x, y, quadName, scale)

@@ -1,5 +1,5 @@
 require ('slam')
-local flux = require ("flux/flux")
+-- local flux = require ("flux/flux")
 
 -- TODO
 -- Network play
@@ -17,7 +17,6 @@ local utilities = require("utilities")
 local resource_manager = require("resource_manager")
 
 local Hero = require("hero")
-local Enemy = require("enemy")
 local EnemyBlue= require("enemy_blue")
 local EnemyRed = require("enemy_red")
 local EnemySubBoss = require("enemy_sub_boss")
@@ -51,7 +50,7 @@ local flagPaused
 local groundHeight = 540
 local winTime
 local gameTime
-local powerupTime
+local lastPowerupTime
 local score
 local level
 local music
@@ -61,11 +60,14 @@ local enemyKillTrigger
 
 -- config
 local joystickDeadzone = 0.20
-local easyMode = true
 local startLevel = 1
 local powerupChance = 0.15
 local droneShootPeriod = 0.6 -- seconds
-local powerupDuration = 10
+-- local powerupDuration = 10
+
+function game.toggleHitbox()
+  utilities.toggleHitbox()
+end
 
 function game.droneShoot()
   if #shotObjects >= maxShotNumber then 
@@ -194,147 +196,139 @@ function game.reload(gameX, gameY, newLevel)
   shotObjects = {}
 end
 
-function game.spawnEnemies(gameX, gameY)
-  --x, y, speed, health, score, image, quad, quad2
-  totalEnemiesKilledThisLevel = 0
-  enemyKillTrigger = 0
-  if easyMode then
-    if level == 1 then
-      music = "dramatic"
-      --table.insert(enemies, EnemyUrn(90 + 100, 180))
-      table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
-     
-    elseif level == 2 then
-      music = "bossfight"
-      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20))
-      
-    else
-      if(winTime < 0) then
-        winTime = gameTime
-      end
-      flagStopped = true
-      flagWin = true
-    end
-  
-  else
-    if level == 1 then
-      music = "dramatic"
-      for i=0,6 do
-        table.insert(enemies, EnemyBlue(i*90 + 100, 180))
-      end
-            
-    elseif level == 2 then
-      music = "dramatic"
-      for i=0,10 do
-        table.insert(enemies, EnemyRed(i*70 + 30, 120))
-      end
-      for i=0,12 do
-        table.insert(enemies, EnemyBlue(i*45 + 100, 180))
-      end
-      
-    elseif level == 3 then
-      music = "dramatic"
-      for i=0,1 do
-        table.insert(enemies, EnemyBlack(i*250 + 250, 25))
-      end
-      
-    elseif level == 4 then
-      music = "dramatic"
-      enemyKillTrigger = 15
-      for i=0,11 do
-        table.insert(enemies, EnemyBlue(i*((gameX - 100.0)/12) + 50, 25))
-      end
-      for i=0,9 do
-        table.insert(enemies, EnemyBlue(i*((gameX - 100.0)/10) + 50, 50))
-      end
-      for i=0,2 do
-        table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
-      end
-      
-    elseif level == 5 then
-      music = "bossfight"
-      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
-      for i=0,6 do
-        table.insert(enemies, EnemyBlue(i*90 + 100, 100))
-      end
-    elseif level == 6 then
-      music = "dramatic"
-      for i=0,2 do
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,3,gameX), 100))
-      end
-    elseif level == 7 then
-      music = "dramatic"
-      for i=0,4 do
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,5,gameX), 25))
-      end
-    elseif level == 8 then
-      music = "dramatic"
-      enemyKillTrigger = 3
-      for i=0,2 do
-        table.insert(enemies, EnemyPurple(spreadEnemy(i,400,3,gameX), 100))
-      end
-      for i=0,4 do
-        table.insert(enemies, EnemyRed(spreadEnemy(i,150,5,gameX), 25))
-      end
-      for i=0,0 do
-        table.insert(enemiesNextWave, EnemyBlack(spreadEnemy(i,200,1,gameX), 100))
-      end
-    elseif level == 9 then
-      music = "dramatic"
-      enemyKillTrigger = 2
-      for i=0,2 do
-        table.insert(enemies, EnemyPurple(spreadEnemy(i,400,3,gameX), 100))
-      end
-      for i=0,4 do
-        table.insert(enemiesNextWave, EnemyUrn(spreadEnemy(i,400,3,gameX), 0))
-      end
-      for i=0,7 do
-        table.insert(enemiesNextWave, EnemyRed(spreadEnemy(i,200,8,gameX), 0))
-      end
-     elseif level == 10 then
-      music = "bossfight"
-      enemyKillTrigger = 3
-      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
-      for i=0,1 do
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,500,2,gameX), -25))
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,450,2,gameX), -50))
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,400,2,gameX), -75))
-        table.insert(enemies, EnemyUrn(spreadEnemy(i,350,2,gameX), -100))
-      end
-    elseif level == 11 then
-      enemyKillTrigger = 6
-      table.insert(enemies, EnemyRedUrn(gameX/2 - 32/2, 20))
-      table.insert(enemiesNextWave, EnemyBlack(gameX/2 - 32/2, 20) ) 
-      
-    elseif level == 15 then
-      music = "bossfight"
-      enemyKillTrigger = 3
-      table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
-      for i=0,2 do
-        table.insert(enemies, EnemyBlack(i*110 + 100, 40))
-      end
-      for i=0,2 do
-        table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
-      end
-   
-    else
-      -- music = "win"
-      if(winTime < 0) then
-        winTime = gameTime
-      end
-      flagStopped = true
-      flagWin = true
-    end
-  end
-  
-  resource_manager.playMusic(music)
-end
-
-function spreadEnemy(i,border,numEnemies,gameX)
+function game.spreadEnemy(i,border,numEnemies,gameX)
   if numEnemies == 1 then
     return gameX/2
   end
   return i*((gameX - border)/(numEnemies-1)) + border/2
+end
+
+function game.spawnEnemies(gameX, gameY)
+  --x, y, speed, health, score, image, quad, quad2
+  totalEnemiesKilledThisLevel = 0
+  enemyKillTrigger = 0
+
+  if level == 0 then
+    music = "dramatic"
+    --table.insert(enemies, EnemyUrn(90 + 100, 180))
+    table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
+  
+  elseif level == 1 then
+    music = "dramatic"
+    for i=0,6 do
+      table.insert(enemies, EnemyBlue(i*90 + 100, 180))
+    end
+          
+  elseif level == 2 then
+    music = "dramatic"
+    for i=0,10 do
+      table.insert(enemies, EnemyRed(i*70 + 30, 120))
+    end
+    for i=0,12 do
+      table.insert(enemies, EnemyBlue(i*45 + 100, 180))
+    end
+    
+  elseif level == 3 then
+    music = "dramatic"
+    for i=0,1 do
+      table.insert(enemies, EnemyBlack(i*250 + 250, 25))
+    end
+    
+  elseif level == 4 then
+    music = "dramatic"
+    enemyKillTrigger = 15
+    for i=0,11 do
+      table.insert(enemies, EnemyBlue(i*((gameX - 100.0)/12) + 50, 25))
+    end
+    for i=0,9 do
+      table.insert(enemies, EnemyBlue(i*((gameX - 100.0)/10) + 50, 50))
+    end
+    for i=0,2 do
+      table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
+    end
+    
+  elseif level == 5 then
+    music = "bossfight"
+    table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
+    for i=0,6 do
+      table.insert(enemies, EnemyBlue(i*90 + 100, 100))
+    end
+    
+  elseif level == 6 then
+    music = "dramatic"
+    for i=0,2 do
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,400,3,gameX), 100))
+    end
+    
+  elseif level == 7 then
+    music = "dramatic"
+    for i=0,4 do
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,400,5,gameX), 25))
+    end
+    
+  elseif level == 8 then
+    music = "dramatic"
+    enemyKillTrigger = 3
+    for i=0,2 do
+      table.insert(enemies, EnemyPurple(game.spreadEnemy(i,400,3,gameX), 100))
+    end
+    for i=0,4 do
+      table.insert(enemies, EnemyRed(game.spreadEnemy(i,150,5,gameX), 25))
+    end
+    for i=0,0 do
+      table.insert(enemiesNextWave, EnemyBlack(game.spreadEnemy(i,200,1,gameX), 100))
+    end
+    
+  elseif level == 9 then
+    music = "dramatic"
+    enemyKillTrigger = 2
+    for i=0,2 do
+      table.insert(enemies, EnemyPurple(game.spreadEnemy(i,400,3,gameX), 100))
+    end
+    for i=0,4 do
+      table.insert(enemiesNextWave, EnemyUrn(game.spreadEnemy(i,400,3,gameX), 0))
+    end
+    for i=0,7 do
+      table.insert(enemiesNextWave, EnemyRed(game.spreadEnemy(i,200,8,gameX), 0))
+    end
+    
+   elseif level == 10 then
+    music = "bossfight"
+    enemyKillTrigger = 3
+    table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
+    for i=0,1 do
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,500,2,gameX), -25))
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,450,2,gameX), -50))
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,400,2,gameX), -75))
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,350,2,gameX), -100))
+    end
+    
+  elseif level == 11 then
+    enemyKillTrigger = 6
+    table.insert(enemies, EnemyRedUrn(gameX/2 - 32/2, 20))
+    table.insert(enemiesNextWave, EnemyBlack(gameX/2 - 32/2, 20) ) 
+    
+  elseif level == 15 then
+    music = "bossfight"
+    enemyKillTrigger = 3
+    table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
+    for i=0,2 do
+      table.insert(enemies, EnemyBlack(i*110 + 100, 40))
+    end
+    for i=0,2 do
+      table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
+    end
+ 
+  else
+    -- music = "win"
+    if(winTime < 0) then
+      winTime = gameTime
+    end
+    flagStopped = true
+    flagWin = true
+  end
+
+  resource_manager.playMusic(music)
 end
 
 function game.update(dt, gameX, gameY)
@@ -359,7 +353,6 @@ function game.update(dt, gameX, gameY)
 
   local remPowerup = {}
   local remEnemy = {}
-  local remShot = {}
   local remShotObject = {}
   
   -- powerups
@@ -385,19 +378,9 @@ function game.update(dt, gameX, gameY)
   -- check for collision with enemies
   for ii,enemy in ipairs(enemies) do
     for jj,shot in ipairs(shotObjects) do
-      if enemy:checkCollision(shot) then    
-        if(not shot:getInert() and enemy:hit(shot:getDisable())) then
-          -- mark that enemy for removal
-          table.insert(remEnemy, ii)
-          score = score + enemy:getScore()
-          
-          game.spawnPowerup(enemy, powerups)
-          
-          if enemy:is(EnemyUrn) then
-            game.destroyUrn(enemy, enemies)
-          end
-
-        end
+      local hit,kill = enemy:checkCollision(shot, enemies)
+      
+      if hit then  
         shot:hit() -- ensure that it won't do damage for another short period
         
         -- mark the shot to be removed
@@ -405,24 +388,35 @@ function game.update(dt, gameX, gameY)
           table.insert(remShotObject, jj)
         end
       end
+      
+      if kill then
+        -- mark that enemy for removal
+        table.insert(remEnemy, ii)
+        score = score + enemy:getScore()
+        game.spawnPowerup(enemy)
+      end
     end
   end
 
   -- remove the marked enemies and shots. work backwards to avoid removing the wrong ones on multiple removal
   -- there are more efficient algos for this that aren't O(n^2) from repeated calls to table.remove()
   for i,enemy in utilities.ripairs(remEnemy) do
+    i = i
     table.remove(enemies, enemy)
     totalEnemiesKilledThisLevel = totalEnemiesKilledThisLevel + 1
   end 
   for i,shot in utilities.ripairs(remShotObject) do
+    i = i
     table.remove(shotObjects, shot)
   end    
   for i,powerup in utilities.ripairs(remPowerup) do
+    i = i
     table.remove(powerups, powerup)
   end    
   
   -- update the enemies' positions
   for i,enemy in ipairs(enemies) do
+    i = i
     enemy:update(dt)
 
     -- check for collision between enemy and hero
@@ -441,6 +435,7 @@ function game.update(dt, gameX, gameY)
   -- spawn more enemies
   if (totalEnemiesKilledThisLevel >= enemyKillTrigger) then
     for i,enemy in ipairs(enemiesNextWave) do
+      i = i
       table.insert(enemies, enemy)
     end
     enemiesNextWave = {}
@@ -469,6 +464,7 @@ function game.getHeroDirection()
   -- sticks
   local joysticks = love.joystick.getJoysticks()
   for i,joystick in ipairs(joysticks) do
+    i = i
     if joystick:isGamepad() then
       local value = joystick:getGamepadAxis('leftx')
       if math.abs(value) > joystickDeadzone then
@@ -488,26 +484,7 @@ function game.getHeroDirection()
   return dir
 end
 
-function game.destroyUrn(enemy, enemies)
-  local swarmNum = 10 
-  if enemy:is(EnemyRedUrn) then
-    swarmNum = 7
-  end
-    
-  for i=0,(swarmNum-1) do
-    local enemy2
-    if enemy:is(EnemyRedUrn) then
-      enemy2 = EnemyRed(enemy:getX(), enemy:getY())
-    else
-      enemy2 = EnemyBlue(enemy:getX(), enemy:getY())
-    end
-    flux.to(enemy2, 2, { x = enemy:getX() + 120*math.cos(i * 2*math.pi / swarmNum), 
-                         y = enemy:getY() + 80*math.sin(i * 2*math.pi / swarmNum) }):ease("backout")
-    table.insert(enemies, enemy2)
-  end
-end
-
-function game.spawnPowerup(enemy, powerups)
+function game.spawnPowerup(enemy)
   local max = #shotStrings * math.ceil(1.0/powerupChance)
   local powerupType = love.math.random(1,max)
   if powerupType <= #shotStrings then
@@ -538,6 +515,7 @@ function game.draw(gameX, gameY)  -- let's draw a background
 
   -- draw enemies
   for i,enemy in ipairs(enemies) do
+    i = i
     enemy:draw()
   end
   
@@ -553,11 +531,13 @@ function game.draw(gameX, gameY)  -- let's draw a background
    
   -- draw powerups
   for i,powerup in ipairs(powerups) do
+    i = i
     powerup:draw()
   end
   
    -- draw shots
   for i,shot in ipairs(shotObjects) do
+    i = i
     shot:draw()
   end
   

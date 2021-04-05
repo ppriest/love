@@ -1,14 +1,15 @@
 local GameObject = Object:extend()
 local resource_manager = require("resource_manager")
+local utilities = require("utilities")
 
-local showHitbox = false
 local flashTime = 0.1
 
-function GameObject:new(x, y, quadName, scale)
+function GameObject:new(x, y, quadName, scale, hitboxProportion)
   self.x = x or 0
   self.y = y or 0
   self.quadName = quadName or nil
   self.scale = scale or 1
+  self.hitBoxProportion = hitboxProportion or 1.0
 
   self.offsetX = 0
   self.offsetY = 0
@@ -33,10 +34,10 @@ function GameObject:recalcScale()
 
   local image, quad = resource_manager.getQuad(self.quadName)
   local x, y, width, height = quad:getViewport()
-  self.offsetX = -(self.scale*width*0.6)/2
-  self.offsetY = -(self.scale*height*0.6)/2
-  self.width = width*self.scale*0.4
-  self.height= height*self.scale*0.4
+  self.offsetX = -(self.scale*width*(1.0 - self.hitBoxProportion))/2
+  self.offsetY = -(self.scale*height*(1.0 - self.hitBoxProportion))/2
+  self.width = width*self.scale*self.hitBoxProportion
+  self.height= height*self.scale*self.hitBoxProportion
 end  
 
 function GameObject:setColor(r, g, b, a)
@@ -91,7 +92,7 @@ function GameObject:draw()
     love.graphics.rectangle("fill", self.x, self.y, self.width, self.height) 
   end
   
-  if showHitbox then
+  if utilities.getShowHitbox() then
     love.graphics.rectangle("line", self.x, self.y, self.width, self.height) 
   end
   

@@ -7,7 +7,7 @@ function EnemyPurple:new(x, y)
   -- custom hitbox
   EnemyPurple.super.new(self, x, y, 8, 12, 10, "death", "purple")
   self.offsetX = -(self.scale*self.width*0.1)/2
-  self.width = self.width*self.scale*0.75
+  self.width = self.width*self.scale*0.50
 end
 
 function EnemyPurple:hit(disable)  

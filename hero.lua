@@ -4,7 +4,7 @@ local GameObject = require("game_object")
 local Hero = GameObject:extend()
 
 function Hero:new(x, y, speed, quadName)
-  Hero.super.new(self, x, y, quadName, 3)
+  Hero.super.new(self, x, y, quadName, 3, 0.6)
   self.speed = speed or 150
 end
 

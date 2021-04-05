@@ -1,4 +1,3 @@
-local flux = require ("flux/flux")
 local Enemy = require("enemy")
 
 local EnemyBlue = Enemy:extend()

@@ -4,7 +4,7 @@ local GameObject = require("game_object")
 local Powerup = GameObject:extend()
 
 function Powerup:new(x, y, speed, powerup)
-  Powerup.super.new(self, x, y, 'powerup' .. powerup, 2)
+  Powerup.super.new(self, x, y, 'powerup' .. powerup, 2, 0.6)
   self.speed = speed or 150
   self.powerup = powerup or 1
 end

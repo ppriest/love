@@ -1,8 +1,6 @@
 local ShotObject = require("shot_object")
 local ShotNormal = ShotObject:extend()
 
-local resource_manager = require("resource_manager")
-
 function ShotNormal:new(x, y, speed, disable)
   ShotNormal.super.new(self, x, y, nil, 1)
   self.speed = speed or 150

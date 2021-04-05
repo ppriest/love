@@ -1,7 +1,7 @@
 Object = require ("classic")
 local flux = require ("flux/flux")
 local globals = require("globals")
---require ("sstrict/sstrict")
+require ("sstrict/sstrict")
 
 local game = require("game")
 
@@ -12,7 +12,7 @@ local winWidth
 local winHeight
 local offsetX
 local offsetY
-local fullscreen = true
+local fullscreen = false
 local mobile = false
 
 -- call after toggling fullscreen/window
@@ -104,6 +104,8 @@ function love.keypressed(k)
     game.togglePause()
   elseif k == 'g' then -- dump globals
     globals.dump(_G,"")
+  elseif k == 'h' then
+    game.toggleHitbox()
   end
 end
 

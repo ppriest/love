@@ -1,8 +1,6 @@
 local ShotObject = require("shot_object")
 local ShotShuriken = ShotObject:extend()
 
-local resource_manager = require("resource_manager")
-
 local radiusX = 0.18
 local radiusY = 0.3
 local speed = 2.0

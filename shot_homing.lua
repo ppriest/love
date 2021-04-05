@@ -1,7 +1,6 @@
 local ShotObject = require("shot_object")
 local ShotHoming = ShotObject:extend()
 
-local resource_manager = require("resource_manager")
 local utilities = require("utilities")
 
 function ShotHoming:new(x, y, speed, disable)

@@ -28,6 +28,7 @@ function utilities.findNearestEnemyX(objectX, enemies)
   -- find closest
 
   for ii,enemy in ipairs(enemies) do
+    ii = ii
     local thisEnemyX = enemy:getX() + enemy:getWidth()/2
     if (enemyDist == nil or (math.abs(objectX - thisEnemyX) < enemyDist)) then
       enemyDist = math.abs(objectX - thisEnemyX)
@@ -85,6 +86,14 @@ function utilities.gradientMesh(dir, ...)
 
     -- Resulting Mesh has 1x1 image size
     return love.graphics.newMesh(meshData, "strip", "static")
+end
+
+local showHitbox = false
+function utilities.getShowHitbox()
+  return showHitbox
+end
+function utilities.toggleHitbox()
+  showHitbox = not showHitbox
 end
 
 return utilities
