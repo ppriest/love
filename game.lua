@@ -202,11 +202,6 @@ function game.spawnEnemies(gameX, gameY)
   --x, y, speed, health, score, image, quad, quad2
   totalEnemiesKilledThisLevel = 0
   enemyKillTrigger = 0
-
-  if level == 0 then
-    music = "dramatic"
-    --table.insert(enemies, EnemyUrn(90 + 100, 180))
-    table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
   
   elseif level == 1 then
     music = "dramatic"
@@ -299,9 +294,13 @@ function game.spawnEnemies(gameX, gameY)
     end
     
   elseif level == 11 then
+    music = "dramatic"
     enemyKillTrigger = 6
     table.insert(enemies, EnemyRedUrn(gameX/2 - 32/2, 20))
     table.insert(enemiesNextWave, EnemyBlack(gameX/2 - 32/2, 20) ) 
+    
+  elseif level == 12 then
+    music = "dramatic"
     
   elseif level == 15 then
     music = "bossfight"
@@ -314,7 +313,12 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
     end
  
-  else
+   if level == 20 then
+    music = "bossfight"
+    --table.insert(enemies, EnemyUrn(90 + 100, 180))
+    table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
+  
+  elseif
     -- music = "win"
     if(winTime < 0) then
       winTime = gameTime
