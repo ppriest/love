@@ -49,22 +49,7 @@ function EnemySubBoss:hit(disable)
   return (self.health <= 0)
 end
 
-
 function EnemySubBoss:checkCollision(shot, enemies)
-  local hit = false
-  local kill = false
-  
-  if utilities.checkBoxCollision(shot, self) then
-    hit = true
-    if not shot:getInert() and self.hit(self, shot:getDisable()) then
-      kill = true
-    end
-  end
-  
-  return hit,kill
-end
-
-function EnemySubBoss:checkCollision(shot)
   local hit = false
   local kill = false
   local remPart = {}
