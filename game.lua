@@ -312,14 +312,7 @@ function game.spawnEnemies(gameX, gameY)
     table.insert(enemiesNextWave, EnemyUrn(game.spreadEnemy(i,500,5,gameX), 80))
   end
   
-  elseif level == 15 then
   elseif level == 13 then
-
-
-
-
-
-
     music = "bossfight"
     enemyKillTrigger = 3
     table.insert(enemies, EnemyBoss(gameX/2 - 32/2, 20) ) 
@@ -330,20 +323,7 @@ function game.spawnEnemies(gameX, gameY)
       table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
     end
  
-  elseif level == 20 then
   elseif level == 14 then
-
-
-
-
-
-
-
-
-
-
-
-
     music = "bossfight"
     --table.insert(enemies, EnemyUrn(90 + 100, 180))
     table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
