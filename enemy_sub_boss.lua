@@ -40,12 +40,13 @@ function EnemySubBoss:checkCollision(shot, enemies)
   
   -- randomly spawn black
   if hit then
-    local rare = love.math.random(1,30)
+    local rare = love.math.random(1,15)
     if rare == 1 then
-      for i=0,6 do
-          local enemy = EnemyBlack(self.x + self.width/2 - 8, self.y + 20)
-          table.insert(enemies, enemy)
-      end
+      local enemy = EnemyBlack(self.x + self.width/2 + (-3 + 10)*self.scale, self.y + 35*self.scale)
+      table.insert(enemies, enemy)
+    elseif rare == 2 then
+      local enemy = EnemyBlack(self.x + self.width/2 + (-3 - 10)*self.scale, self.y + 35*self.scale)
+      table.insert(enemies, enemy)
     end
   end
   
