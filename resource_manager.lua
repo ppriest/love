@@ -65,12 +65,11 @@ function resource_manager.load()
   end
   
   
-  
   images["sub_boss"] = love.graphics.newImage("art/sub_boss.png")
   local image3 = images["sub_boss"]
   
   --enemies
-  quads["sub_boss_main"] =  {quad=love.graphics.newQuad(0*tS10,0*tS10,4*tS10,5*tS10 + 3,image3:getDimensions()), image=image3}
+  quads["sub_boss_main"] = {quad=love.graphics.newQuad(0*tS10,0*tS10,4*tS10,5*tS10 + 3,image3:getDimensions()), image=image3}
   quads["sub_boss_lwing"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_rwing"] = {quad=love.graphics.newQuad(4*tS10,2*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_cockpit"] = {quad=love.graphics.newQuad(5*tS10,4*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
@@ -79,7 +78,17 @@ function resource_manager.load()
   quads["sub_boss_prop"] = {quad=love.graphics.newQuad(5*tS10,2*tS10,5,3,image3:getDimensions()), image=image3}
   quads["sub_boss_prop_dmg"] = {quad=love.graphics.newQuad(6*tS10,2*tS10,6,6,image3:getDimensions()), image=image3}
 
+  images["caterpillar_boss"] = love.graphics.newImage("art/caterpillar_boss.png")
+  local image4 = images["caterpillar_boss"]
   
+  quads["caterpillar_boss_main"] = {quad=love.graphics.newQuad(0*tS10,0*tS10,3*tS10 - 2,5*tS10 - 3,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_lfoot"] = {quad=love.graphics.newQuad(3*tS10,0*tS10,3,3,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_rfoot"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,3,3,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_booster"] = {quad=love.graphics.newQuad(3*tS10,1*tS10,3,6,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_nose1"] = {quad=love.graphics.newQuad(3*tS10,2*tS10,6,9,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_nose2"] = {quad=love.graphics.newQuad(4*tS10,1*tS10,6,2,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_back"] = {quad=love.graphics.newQuad(4*tS10,2*tS10,7,4,image4:getDimensions()), image=image4}
+    
    
   music["dramatic"] = love.audio.newSource("sounds/538828__puredesigngirl__dramatic-music.mp3", "stream")
   music["bossfight"] = love.audio.newSource("sounds/251415__tritus__fight-loop.ogg", "stream")

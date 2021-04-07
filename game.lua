@@ -20,6 +20,7 @@ local Hero = require("hero")
 local EnemyBlue= require("enemy_blue")
 local EnemyRed = require("enemy_red")
 local EnemySubBoss = require("enemy_sub_boss")
+local EnemyCaterpillarBoss = require("enemy_caterpillar_boss")
 local EnemyBoss = require("enemy_boss")
 local EnemyBlack = require("enemy_black")
 local EnemyPurple = require("enemy_purple")
@@ -335,6 +336,11 @@ function game.spawnEnemies(gameX, gameY)
     music = "bossfight"
     --table.insert(enemies, EnemyUrn(90 + 100, 180))
     table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
+    
+  elseif level == 15 then
+    music = "bossfight"
+    --table.insert(enemies, EnemyUrn(90 + 100, 180))
+    table.insert(enemies, EnemyCaterpillarBoss(gameX/2 - 40, 50))
   
   else
     -- music = "win"
