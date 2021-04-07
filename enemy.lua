@@ -17,6 +17,8 @@ function Enemy:new(x, y, speed, health, score, soundName, quadName, scale, hitbo
 
   self.timeLastDamaged = 0
   
+  self.parts = {}
+      
   self.a = 0
   flux.to(self, invulnerableDuration, { a = 1 }):ease("linear")
 end
@@ -34,6 +36,11 @@ function Enemy:update(dt)
   
   -- movement
   self.y = self.y + dt*self.speed
+  
+  for ii, part in pairs(self.parts) do
+    ii = ii
+    part:update(dt)
+  end
 end
 
 function Enemy:hit(disable)
@@ -50,22 +57,51 @@ function Enemy:hit(disable)
   if (self.health == 0) then
     resource_manager.playSound(self.soundName)
   end
+  
+  for ii, part in pairs(self.parts) do
+    ii = ii
+    part:hit(disable)
+  end
+  
   return (self.health <= 0)
 end
 
 function Enemy:draw()
   Enemy.super.draw(self)
+
+  for ii, part in pairs(self.parts) do
+    ii = ii
+    part:draw()
+  end
+
 end
 
 -- first return is whether shot hit, second is if enemy is destroyed and should be removed
 function Enemy:checkCollision(shot, enemies)
   local hit = false
   local kill = false
+  local remPart = {}
+
+  for ii, part in pairs(self.parts) do
+    if utilities.checkBoxCollision(shot, part) then
+      hit = true
+      if not shot:getInert() and part.hit(part, false) then
+        table.insert(remPart, ii)
+      end
+    end
+  end
   
-  if utilities.checkBoxCollision(shot, self) then
-    hit = true
-    if not shot:getInert() and self.hit(self, shot:getDisable()) then
-      kill = true
+  for ii,part in utilities.ripairs(remPart) do
+    ii = ii
+    table.remove(self.parts, part)
+  end 
+  
+  if #self.parts == 0 then
+    if utilities.checkBoxCollision(shot, self) then
+      hit = true
+      if not shot:getInert() and self.hit(self, false) then
+        kill = true
+      end
     end
   end
   

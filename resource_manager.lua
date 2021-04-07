@@ -70,11 +70,10 @@ function resource_manager.load()
   local image3 = images["sub_boss"]
   
   --enemies
-  quads["sub_boss_main"] =  {quad=love.graphics.newQuad(0*tS10,0*tS10,4*tS10,5*tS10,image3:getDimensions()), image=image3}
+  quads["sub_boss_main"] =  {quad=love.graphics.newQuad(0*tS10,0*tS10,4*tS10,5*tS10 + 3,image3:getDimensions()), image=image3}
   quads["sub_boss_lwing"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_rwing"] = {quad=love.graphics.newQuad(4*tS10,2*tS10,0.6*tS10,2*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_cockpit"] = {quad=love.graphics.newQuad(5*tS10,4*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
-  quads["sub_boss_cockpit_dmg"] = {quad=love.graphics.newQuad(5*tS10,5*tS10,3*tS10,1*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_window"] = {quad=love.graphics.newQuad(5*tS10,3*tS10,1*tS10,1*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_window_dmg"] = {quad=love.graphics.newQuad(6*tS10,3*tS10,1*tS10,1*tS10,image3:getDimensions()), image=image3}
   quads["sub_boss_prop"] = {quad=love.graphics.newQuad(5*tS10,2*tS10,5,3,image3:getDimensions()), image=image3}
