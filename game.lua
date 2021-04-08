@@ -418,7 +418,10 @@ function game.update(dt, gameX, gameY)
       if kill then
         -- mark that enemy for removal
         table.insert(remEnemy, ii)
-        table.insert(effects, Effect(shot:getX() - 40, shot:getY() - 60, "effect_explosion", 3))
+        
+        local rotation = love.math.random()*360
+        local scale = love.math.random() + 2.5
+        table.insert(effects, Effect(shot:getX() - 0, shot:getY() - 0, rotation, "effect_explosion", scale))
         score = score + enemy:getScore()
         game.spawnPowerup(enemy)
       end

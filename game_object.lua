@@ -15,6 +15,9 @@ function GameObject:new(x, y, quadName, scale, hitboxProportion)
   self.offsetY = 0
   self.height = 15
   self.width = 30
+  self.rotation = 0
+  self.originX = 0
+  self.originX = 0
   GameObject.recalcScale(self)
   
   self.r = 1
@@ -91,8 +94,7 @@ function GameObject:draw()
   
   if self.quadName then
     local image, quad = resource_manager.getQuad(self.quadName)
-    love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, 0, self.scale, self.scale)
-
+    love.graphics.draw(image, quad, self.x + self.offsetX, self.y + self.offsetY, self.rotation*(180.0/math.pi), self.scale, self.scale, self.originX, self.originY)
   else
     love.graphics.rectangle("fill", self.x, self.y, self.width, self.height) 
   end
