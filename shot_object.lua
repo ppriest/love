@@ -3,6 +3,8 @@ local ShotObject = GameObject:extend()
 
 local inertTime = 0.1 -- won't damage again for this long
 
+-- Abstract Shot class
+
 function ShotObject:new(x, y, quadName, scale)
   ShotObject.super.new(self, x, y, quadName, scale)
 

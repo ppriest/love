@@ -6,6 +6,14 @@ local GameObject = require("game_object")
 
 local Enemy = GameObject:extend()
 
+-- Enemies:
+-- * Descend automatically (unless disabled)
+-- * Have health
+-- * Are invulnerable when spawning (and fadein)
+-- * Play a sound on death
+-- * Grant a score to the player on death
+-- * Can be composed of many sub-parts which must be destroyed before the main area (e.g. a traditional shmup boss)
+
 local invulnerableDuration = 0.5
 
 function Enemy:new(x, y, speed, health, score, soundName, quadName, scale, hitboxProportion)

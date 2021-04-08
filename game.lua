@@ -30,6 +30,7 @@ local ShotNormal = require("shot_normal")
 local ShotHoming = require("shot_homing")
 local ShotShuriken = require("shot_shuriken")
 local Powerup = require("powerup")
+local Effect = require("effect")
 
 -- game objects
 local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Boom", "Disable", "Shuriken" }
@@ -39,6 +40,7 @@ local shotObjects
 local enemies
 local enemiesNextWave
 local powerups
+local effects
 local maxShotNumber
 local curShotSpeed
 local weaponType
@@ -197,6 +199,7 @@ function game.reload(gameX, gameY, newLevel)
   enemies = {}
   enemiesNextWave = {}
   powerups = {}
+  effects = {}
   game.spawnEnemies(gameX, gameY)
   shotObjects = {}
 end
@@ -415,6 +418,7 @@ function game.update(dt, gameX, gameY)
       if kill then
         -- mark that enemy for removal
         table.insert(remEnemy, ii)
+        table.insert(effects, Effect(shot:getX() - 40, shot:getY() - 60, "effect_explosion", 3))
         score = score + enemy:getScore()
         game.spawnPowerup(enemy)
       end
@@ -473,6 +477,12 @@ function game.update(dt, gameX, gameY)
     end
   end
   
+  for ii,effect in utilities.ripairs(effects) do
+    if effect:update(dt) then
+      table.remove(effects, ii)
+    end
+  end
+
   -- check for win condition
   if #enemies == 0 then
     level = level + 1
@@ -558,6 +568,12 @@ function game.draw(gameX, gameY)  -- let's draw a background
   for i,powerup in ipairs(powerups) do
     i = i
     powerup:draw()
+  end
+  
+  -- draw effects
+  for i,effect in ipairs(effects) do
+    i = i
+    effect:draw()
   end
   
    -- draw shots

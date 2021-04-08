@@ -89,7 +89,11 @@ function resource_manager.load()
   quads["caterpillar_boss_nose2"] = {quad=love.graphics.newQuad(4*tS10,1*tS10,6,2,image4:getDimensions()), image=image4}
   quads["caterpillar_boss_back"] = {quad=love.graphics.newQuad(4*tS10,2*tS10,7,4,image4:getDimensions()), image=image4}
     
+  images["effects"] = love.graphics.newImage("art/effects.png")
+  local image5 = images["effects"]
    
+  quads["effect_explosion"] = {quad=love.graphics.newQuad(0*tS10,0*tS10,3*tS10,3*tS10,image5:getDimensions()), image=image5}
+
   music["dramatic"] = love.audio.newSource("sounds/538828__puredesigngirl__dramatic-music.mp3", "stream")
   music["bossfight"] = love.audio.newSource("sounds/251415__tritus__fight-loop.ogg", "stream")
   --music[]:setVolume(0.9) -- 90% of ordinary volume
