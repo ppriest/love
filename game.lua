@@ -419,9 +419,22 @@ function game.update(dt, gameX, gameY)
         -- mark that enemy for removal
         table.insert(remEnemy, ii)
         
-        local rotation = love.math.random()*360
-        local scale = love.math.random() + 2.5
-        table.insert(effects, Effect(shot:getX() - 0, shot:getY() - 0, rotation, "effect_explosion", scale))
+        if enemy:is(EnemySubBoss) or enemy:is(EnemyCaterpillarBoss) then
+          for kk=0,10,1
+          do
+            local rotation = love.math.random()*360
+            local scale = love.math.random() + 2.5
+            local randomX = (love.math.random() * 40) - 20
+            local randomy = (love.math.random() * 40) - 20
+            local randomTTL = (love.math.random() * 5) + 0.3
+            table.insert(effects, Effect(shot:getX() - randomX, shot:getY() - randomy, rotation, "effect_explosion", scale, randomTTL, randomTTL))
+          end
+        else
+          local rotation = love.math.random()*360
+          local scale = love.math.random() + 2.5
+          table.insert(effects, Effect(shot:getX(), shot:getY(), rotation, "effect_explosion", scale))
+        end
+
         score = score + enemy:getScore()
         game.spawnPowerup(enemy)
       end

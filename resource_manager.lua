@@ -82,8 +82,8 @@ function resource_manager.load()
   local image4 = images["caterpillar_boss"]
   
   quads["caterpillar_boss_main"] = {quad=love.graphics.newQuad(0*tS10,0*tS10,3*tS10 - 2,5*tS10 - 3,image4:getDimensions()), image=image4}
-  quads["caterpillar_boss_lfoot"] = {quad=love.graphics.newQuad(3*tS10,0*tS10,3,3,image4:getDimensions()), image=image4}
-  quads["caterpillar_boss_rfoot"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,3,3,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_rfoot"] = {quad=love.graphics.newQuad(3*tS10,0*tS10,3,3,image4:getDimensions()), image=image4}
+  quads["caterpillar_boss_lfoot"] = {quad=love.graphics.newQuad(4*tS10,0*tS10,3,3,image4:getDimensions()), image=image4}
   quads["caterpillar_boss_booster"] = {quad=love.graphics.newQuad(3*tS10,1*tS10,3,6,image4:getDimensions()), image=image4}
   quads["caterpillar_boss_nose1"] = {quad=love.graphics.newQuad(3*tS10,2*tS10,6,9,image4:getDimensions()), image=image4}
   quads["caterpillar_boss_nose2"] = {quad=love.graphics.newQuad(4*tS10,1*tS10,6,2,image4:getDimensions()), image=image4}
