@@ -6,7 +6,7 @@ local EnemyRed = require("enemy_red")
 local EnemyUrn = Enemy:extend()
 
 function EnemyUrn:new(x, y, quadName, spawnType)
-  EnemyUrn.super.new(self, x, y, 4, 1, 0, "smash", quadName or "urn")
+  EnemyUrn.super.new(self, x, y, 10, 1, 0, "smash", quadName or "urn")
   self.spawnType = spawnType or "blue"
 end
 

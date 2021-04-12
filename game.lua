@@ -426,7 +426,7 @@ function game.update(dt, gameX, gameY)
             local scale = love.math.random() + 2.5
             local randomX = (love.math.random() * 40) - 20
             local randomy = (love.math.random() * 40) - 20
-            local randomTTL = (love.math.random() * 5) + 0.3
+            local randomTTL = (love.math.random() * 3) + 0.3
             table.insert(effects, Effect(shot:getX() - randomX, shot:getY() - randomy, rotation, "effect_explosion", scale, randomTTL, randomTTL))
           end
         else

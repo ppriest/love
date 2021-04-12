@@ -6,7 +6,7 @@ local Enemy = require("enemy")
 local EnemyCaterpillarBoss = Enemy:extend()
 
 function EnemyCaterpillarBoss:new(x, y)
-  self.speed = 2
+  self.speed = 3
   EnemyCaterpillarBoss.super.new(self, x, y, self.speed, 50, 10, "death", "caterpillar_boss_main")
   self.scale = 4
   self.width = 28*self.scale
