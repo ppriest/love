@@ -113,6 +113,14 @@ vec4 effect(vec4 vcolor, Image tex, vec2 texcoord, vec2 pixcoord)
 }
 ]]
 
+  shaders["grey"] = love.graphics.newShader[[
+vec4 effect(vec4 vcolor, Image tex, vec2 texcoord, vec2 pixcoord)
+{
+    vec4 outputcolor = Texel(tex, texcoord) * vcolor;
+    outputcolor.rgb /= vec3(3);
+    return outputcolor;
+}
+]]
 end
 
 

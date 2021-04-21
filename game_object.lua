@@ -28,6 +28,7 @@ function GameObject:new(x, y, quadName, scale, hitboxProportion)
   self.time = 0
   self.flashStartTime = 0
   self.flashing = false
+  self.disabled = false
 end
 
 function GameObject:recalcScale()
@@ -83,9 +84,10 @@ function GameObject:update(dt)
 end
 
 function GameObject:draw()
-  local shader = resource_manager.getShader("white")
   if self.flashing then
-    love.graphics.setShader(shader)
+    love.graphics.setShader(resource_manager.getShader("white"))
+  elseif self.disabled then
+   love.graphics.setShader(resource_manager.getShader("grey"))    
   else
     love.graphics.setShader()
   end

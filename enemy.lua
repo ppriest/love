@@ -56,6 +56,7 @@ function Enemy:hit(disable)
   
   if disable then
     self.speed = 0
+    self.disabled = true
   end
   
   if self.time > invulnerableDuration then
