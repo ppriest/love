@@ -266,7 +266,7 @@ function game.spawnEnemies(gameX, gameY)
   elseif level == 7 then
     music = "dramatic"
     for i=0,4 do
-      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,400,5,gameX), 25))
+      table.insert(enemies, EnemyUrn(game.spreadEnemy(i,700,5,gameX), 25))
     end
     
   elseif level == 8 then
@@ -308,9 +308,9 @@ function game.spawnEnemies(gameX, gameY)
     
   elseif level == 11 then
     music = "dramatic"
-    enemyKillTrigger = 6
-    table.insert(enemies, EnemyRedUrn(gameX/2 - 32/2, 20))
-    table.insert(enemiesNextWave, EnemyBlack(gameX/2 - 32/2, 20) ) 
+    for i=0,2 do
+      table.insert(enemies, EnemyRedUrn(game.spreadEnemy(i,500,2,gameX), 125))
+    end
     
   elseif level == 12 then
     music = "dramatic"
@@ -321,8 +321,8 @@ function game.spawnEnemies(gameX, gameY)
      table.insert(enemiesNextWave, EnemyRed(game.spreadEnemy(i,300,10,gameX), 65))
     end
     for i=0,4 do
-    table.insert(enemiesNextWave, EnemyUrn(game.spreadEnemy(i,500,5,gameX), 80))
-  end
+      table.insert(enemiesNextWave, EnemyUrn(game.spreadEnemy(i,500,5,gameX), 80))
+    end
   
   elseif level == 13 then
     music = "bossfight"
@@ -375,7 +375,7 @@ function game.update(dt, gameX, gameY)
   if weaponType == 5 then
     local dir = utilities.findNearestEnemyX(drone:getX() + drone:getWidth()/2, enemies)
     drone:update(dt, dir, gameX, gameY)
-  end
+  end   
 
   local remPowerup = {}
   local remEnemy = {}

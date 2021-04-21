@@ -93,7 +93,7 @@ function Enemy:checkCollision(shot, enemies)
   for ii, part in pairs(self.parts) do
     if utilities.checkBoxCollision(shot, part) then
       hit = true
-      if not shot:getInert() and part.hit(part, false) then
+      if not shot:getInert() and part.hit(part, shot:getDisable()) then
         table.insert(remPart, ii)
       end
     end
@@ -107,7 +107,7 @@ function Enemy:checkCollision(shot, enemies)
   if #self.parts == 0 then
     if utilities.checkBoxCollision(shot, self) then
       hit = true
-      if not shot:getInert() and self.hit(self, false) then
+      if not shot:getInert() and self.hit(self, shot:getDisable()) then
         kill = true
       end
     end
