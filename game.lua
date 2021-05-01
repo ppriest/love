@@ -33,7 +33,7 @@ local Powerup = require("powerup")
 local Effect = require("effect")
 
 -- game objects
-local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Boom", "Disable", "Shuriken" }
+local shotStrings = { "Normal", "Triple", "Fast", "Homing", "Drone", "Boom", "Disable", "Shuriken", "Elite" }
 local hero
 local drone
 local shotObjects
@@ -97,7 +97,7 @@ function game.shoot()
   if(weaponType == 8) then
     local dir = (((totalShotCount % 2) * 2) - 1) -- -1/1
     table.insert(shotObjects, ShotShuriken(hx, hy, dir))
-  elseif(weaponType == 4) then
+  elseif(weaponType == 4 or weaponType == 9) then
     table.insert(shotObjects, ShotHoming(hx, hy, curShotSpeed))
   else
     table.insert(shotObjects, ShotNormal(hx, hy, curShotSpeed, weaponType == 7))
@@ -120,7 +120,7 @@ function game.chooseWeaponType(mode)
   
   lastPowerupTime = gameTime
   
-  mode = mode or love.math.random(1,8)
+  mode = mode or love.math.random(1,#shotStrings)
   weaponType = mode
   local heroImage = 1
 
@@ -153,6 +153,10 @@ function game.chooseWeaponType(mode)
     curShotSpeed = 0
     maxShotNumber = 7
     heroImage = 6
+  elseif weaponType == 9 then -- elite
+    curShotSpeed = 800
+    maxShotNumber = 1
+    heroImage = 7
   else
     curShotSpeed = 0
     maxShotNumber = 0
@@ -334,13 +338,22 @@ function game.spawnEnemies(gameX, gameY)
     for i=0,2 do
       table.insert(enemiesNextWave, EnemyBlack(gameX - (i*110 + 100), 40))
     end
- 
+    
   elseif level == 14 then
+    music = "dramatic"
+    for i=0,9 do
+     table.insert(enemies, EnemyUrn(game.spreadEnemy(i,500,10,gameX), 10))
+    end
+    for i=0,2 do
+      table.insert(enemies, EnemyRedUrn(game.spreadEnemy(i,500,3,gameX), 10))
+    end
+    
+  elseif level == 15 then
     music = "bossfight"
     --table.insert(enemies, EnemyUrn(90 + 100, 180))
     table.insert(enemies, EnemySubBoss(gameX/2 - 40, 50))
     
-  elseif level == 15 then
+  elseif level == 20 then
     music = "bossfight"
     --table.insert(enemies, EnemyUrn(90 + 100, 180))
     table.insert(enemies, EnemyCaterpillarBoss(gameX/2 - 40, 50))
