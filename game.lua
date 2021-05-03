@@ -314,7 +314,7 @@ function game.spawnEnemies(gameX, gameY)
     music = "dramatic"
     for i=0,2 do
       table.insert(enemies, EnemyRedUrn(game.spreadEnemy(i,500,2,gameX), 125))
-    end
+    end 
     
   elseif level == 12 then
     music = "dramatic"
@@ -370,6 +370,53 @@ function game.spawnEnemies(gameX, gameY)
   resource_manager.playMusic(music)
 end
 
+-- ????
+function utilities.findDroneTarget(objectX, enemiesLocal)
+  local enemyDist = nil
+  local enemyDir = 0
+  local enemyX = objectX
+  
+  local foundBlack = false
+
+  -- find closest
+
+  -- find closest black
+  for ii,enemy in ipairs(enemiesLocal) do
+    ii = ii
+    if enemy:is(EnemyBlack) then
+      local thisEnemyX = enemy:getX() + enemy:getWidth()/2
+      if (enemyDist == nil or (math.abs(objectX - thisEnemyX) < enemyDist)) then
+        enemyDist = math.abs(objectX - thisEnemyX)
+        enemyX = thisEnemyX
+        foundBlack = true
+      end
+    end
+  end
+
+  if not foundBlack then
+    for ii,enemy in ipairs(enemiesLocal) do
+      ii = ii
+      local thisEnemyX = enemy:getX() + enemy:getWidth()/2
+      if (enemyDist == nil or (math.abs(objectX - thisEnemyX) < enemyDist)) then
+        enemyDist = math.abs(objectX - thisEnemyX)
+        enemyX = thisEnemyX
+      end
+    end
+  end
+
+  if(enemyDist < 3) then
+    -- stop oscillation
+    enemyDir = 0
+  elseif(objectX > enemyX) then
+    enemyDir = -1
+  elseif (objectX < enemyX) then
+    enemyDir = 1
+  end
+  
+  return enemyDir
+end
+
+
 function game.update(dt, gameX, gameY)
   -- if paused, then gametime should stop
   if flagPaused then
@@ -386,7 +433,7 @@ function game.update(dt, gameX, gameY)
   
   hero:update(dt, game.getHeroDirection(), gameX, gameY)
   if weaponType == 5 then
-    local dir = utilities.findNearestEnemyX(drone:getX() + drone:getWidth()/2, enemies)
+    local dir = utilities.findDroneTarget(drone:getX() + drone:getWidth()/2, enemies)
     drone:update(dt, dir, gameX, gameY)
   end   
 

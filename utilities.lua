@@ -26,7 +26,6 @@ function utilities.findNearestEnemyX(objectX, enemies)
   local enemyX = objectX
 
   -- find closest
-
   for ii,enemy in ipairs(enemies) do
     ii = ii
     local thisEnemyX = enemy:getX() + enemy:getWidth()/2
@@ -47,6 +46,11 @@ function utilities.findNearestEnemyX(objectX, enemies)
   
   return enemyDir
 end
+
+
+
+
+
 
 
 function utilities.gradientMesh(dir, ...)

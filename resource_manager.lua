@@ -41,7 +41,7 @@ function resource_manager.load()
   quads["red_urn"] =        {quad=love.graphics.newQuad(1*tS,3*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   
   --hero
-  for ii=1,6,1
+  for ii=1,7,1
   do
     quads["hero" .. ii] = {quad=love.graphics.newQuad(5*tS,(ii-1)*tS,1*tS,1*tS,image1:getDimensions()), image=image1}
   end
@@ -59,7 +59,7 @@ function resource_manager.load()
   images["powerups"] = love.graphics.newImage("art/powerups.png")
   local image2 = images["powerups"]
   
-  for ii=1,8,1
+  for ii=1,9,1
   do
     quads["powerup" .. ii] = {quad=love.graphics.newQuad ((ii-1)*tS10,0*tS10,1*tS10,1*tS10,image2:getDimensions()), image=image2}   
   end
